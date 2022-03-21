@@ -1,3 +1,6 @@
+//// -- LEVEL 1
+//// -- Tables and References
+
 // Creating tables
 Table Users as U {
   ID int [pk, increment] // auto-increment
@@ -34,11 +37,21 @@ Table Tickets as T {
   TCreatorID int
   TAssignedID int
   TCategoryID int
-  TPriority int
+  TPriorityID int
+  TStatusID int
   TRequesterID int
   TCreatedAt timestamp
   TClosed timestamp
   TClosedByID int
+}
+
+Ref: TC.TicketID < T.ID
+Ref: TC.UserID < U.ID
+Table TicketChangelog as TC {
+  ID int [pk, increment]
+  TicketID int
+  UserID int
+  LogText nvarchar
 }
 
 Ref: TEdit.TicketID < T.ID
@@ -62,10 +75,28 @@ Table Comments as C {
 
 Ref: Sub.TicketID < T.ID
 Ref: Sub.UserID < U.ID
-Table SubscribedTo as Sub {
+Table Subscribers as Sub {
   ID int [pk, increment]
   UserID int
   TicketID int
+}
+
+Ref: Cat.ID > T.TCategoryID
+Table Category as Cat {
+  ID int [pk, increment]
+  Category nvarchar
+}
+
+Ref: P.ID > T.TPriorityID
+Table Priority as P {
+  ID int [pk, increment]
+  Priority nvarchar
+}
+
+Ref: Stat.ID > T.TStatusID
+Table Status as Stat {
+  ID int [pk, increment]
+  Status nvarchar
 }
 
 // Creating references
@@ -73,3 +104,4 @@ Table SubscribedTo as Sub {
 // > many-to-one; < one-to-many; - one-to-one
 //Ref: U.country_code > countries.code  
 //Ref: merchants.country_code > countries.code
+
