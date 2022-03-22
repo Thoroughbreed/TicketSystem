@@ -6,5 +6,31 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <table class="table table-striped">
+        <thead>
+        <th>Titel</th>
+        <th>Beskrivelse</th>
+        <th>Oprettet af</th>
+        <th>Oprettet den</th>
+        <th>Anmoder</th>
+        <th>Anmoder mail</th>
+        <th>Prioritet</th>
+        <th>Kategori</th>
+        <th>Status</th>
+        </thead>
+        @foreach (var item in @Model.Tickets)
+        {
+            <tr>
+                <td>@item.TCaption</td>
+                <td>@item.TDesc</td>
+                <td>@item.Creator.display_name</td>
+                <td>@item.TCreatedAt</td>
+                <td>@item.Requester.full_name</td>
+                <td>@item.Requester.email</td>
+                <td>@item.Priority.priority</td>
+                <td>@item.Category.category</td>
+                <td>@item.Status.status @item.TStatusID</td>
+            </tr>
+        }
+    </table>
 </div>

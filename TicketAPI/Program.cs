@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using TicketAPI.DAL;
+using TicketAPI.Models;
 using static Microsoft.AspNetCore.Http.Results;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,7 +22,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors();
-builder.Services.AddDbContext<TicketDb>(option => option.UseInMemoryDatabase("TicketList"));
+//builder.Services.AddDbContext<TicketDb>(option => option.UseInMemoryDatabase("TicketList"));
+builder.Services.AddDbContext<TicketDb>();
 
 
 var app = builder.Build();
@@ -37,6 +39,30 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapGet("/", () => "Hello World!");
+
+app.MapGet("/tickets", async (TicketDb db) =>
+{
+    var tickets = await db.Tickets
+        .Where(t => t.TClosed == false)
+        .Include(t => t.Priority)
+        .Include(t => t.Status)
+        .Include(t => t.Category)
+        .Include(t => t.Creator)
+        .Include(t => t.Asignee)
+        .Include(t => t.Requester)
+        .Include(t => t.Comments)
+        .ThenInclude(c => c.User)
+        .ToListAsync();
+    return tickets;
+});
+
+app.MapGet("/users", async (TicketDb db) =>
+{
+    var users = await db.Users
+        .Include(u => u.Role)
+        .ToListAsync();
+    return users;
+});
 
 app.Run();

@@ -1,7 +1,10 @@
+using TicketFrontend.Service;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<ITicketService, TicketService>();
 
 var app = builder.Build();
 
