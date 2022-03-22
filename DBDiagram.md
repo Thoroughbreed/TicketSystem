@@ -41,8 +41,9 @@ Table Tickets as T {
   TStatusID int
   TRequesterID int
   TCreatedAt timestamp
-  TClosed timestamp
+  TClosedat timestamp
   TClosedByID int
+  TClosed boolean
 }
 
 Ref: TC.TicketID < T.ID
