@@ -5,6 +5,8 @@ namespace TicketFrontend.Service;
 public class TicketService : ITicketService
 {
     private HttpClient _client;
+    private readonly string _baseUrl = "https://localhost:7229/tickets";
+    private readonly string _commentUrl = "https://localhost:7229/comments";
 
     public TicketService()
     {
@@ -12,7 +14,27 @@ public class TicketService : ITicketService
     }
     public async Task<List<Ticket>> GetTickets()
     {
-        var items = await _client.GetFromJsonAsync<List<Ticket>>("https://localhost:7229/tickets");
+        var items = await _client.GetFromJsonAsync<List<Ticket>>(_baseUrl);
         return items != null ? items.OrderByDescending(t => t.TPriorityID).ToList() : new List<Ticket>();
+    }
+
+    public async Task CloseTicket(int ticketId, int userId)
+    {
+        var tickets = await _client.GetFromJsonAsync<List<Ticket>>(_baseUrl);
+        var ticket = tickets.FirstOrDefault(t => t.ID == ticketId);
+        ticket.TClosedByID = userId;
+        ticket.TClosed = true;
+
+        await _client.PutAsJsonAsync(_baseUrl, ticket);
+    }
+
+    public async Task EditTicket(Ticket ticket)
+    {
+        await _client.PutAsJsonAsync(_baseUrl, ticket);
+    }
+
+    public async Task CreateComment(Comments comment)
+    {
+        await _client.PostAsJsonAsync(_commentUrl, comment);
     }
 }

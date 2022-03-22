@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -41,6 +42,7 @@ app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World!");
 
+
 app.MapGet("/tickets", async (TicketDb db) =>
 {
     var tickets = await db.Tickets
@@ -52,10 +54,35 @@ app.MapGet("/tickets", async (TicketDb db) =>
         .Include(t => t.Asignee)
         .Include(t => t.Requester)
         .Include(t => t.Comments)
-        .ThenInclude(c => c.User)
+            .ThenInclude(c => c.User)
         .ToListAsync();
     return tickets;
 });
+
+app.MapPut("/tickets", async (Ticket ticket, TicketDb db) =>
+{
+    db.Update(ticket);
+    await db.SaveChangesAsync();
+    return HttpStatusCode.OK;
+});
+
+app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
+{
+    db.Add(ticket);
+    await db.SaveChangesAsync();
+    return HttpStatusCode.Created;
+});
+
+
+
+app.MapPost("/Comments", async (Comments comment, TicketDb db) =>
+{
+    db.Add(comment);
+    await db.SaveChangesAsync();
+    return HttpStatusCode.Created;
+});
+
+
 
 app.MapGet("/users", async (TicketDb db) =>
 {
@@ -64,5 +91,6 @@ app.MapGet("/users", async (TicketDb db) =>
         .ToListAsync();
     return users;
 });
+
 
 app.Run();

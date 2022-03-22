@@ -7,15 +7,14 @@ namespace TicketFrontend.Pages;
 
 public class IndexModel : PageModel
 {
-    private readonly ILogger<IndexModel> _logger;
     private readonly ITicketService _service;
 
     [BindProperty(SupportsGet = true)]
     public List<Ticket> Tickets { get; set; }
+    public Comments Comment { get; set; }
     
-    public IndexModel(ILogger<IndexModel> logger, ITicketService service)
+    public IndexModel(ITicketService service)
     {
-        _logger = logger;
         _service = service;
     }
 
@@ -23,5 +22,16 @@ public class IndexModel : PageModel
     { 
         Tickets = await _service.GetTickets();
         return Page();
+    }
+
+    public async Task<IActionResult> OnGetCloseTaskDebug(int ticketId, int userId)
+    {
+        await _service.CloseTicket(ticketId, userId);
+        return Page();
+    }
+
+    public async Task OnPostComment(Comments comment)
+    {
+        await _service.CreateComment(comment);
     }
 }
