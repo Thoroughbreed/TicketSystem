@@ -1,31 +1,22 @@
-using System;
-using System.Linq;
 using System.Net;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using TicketAPI.DAL;
 using TicketAPI.Models;
-using static Microsoft.AspNetCore.Http.Results;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddCors();
-//builder.Services.AddDbContext<TicketDb>(option => option.UseInMemoryDatabase("TicketList"));
 builder.Services.AddDbContext<TicketDb>();
 
+// Uncomment lines below to use authentication roles for API
+// builder.Services.AddAuthorization(options =>
+// {
+//     options.AddPolicy("R", policy => policy.RequireAuthenticatedUser().RequireClaim("permissions", "ticket:read"));
+//     options.AddPolicy("E", policy => policy.RequireAuthenticatedUser().RequireClaim("permissions", "ticket:write"));
+// });
 
 var app = builder.Build();
 
@@ -37,12 +28,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+// Uncomment line below to use authentication for API
+// app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World!");
 
-
+#region TICKETS
+// Gets a list of all tickets not closed
 app.MapGet("/tickets", async (TicketDb db) =>
 {
     var tickets = await db.Tickets
@@ -50,15 +43,41 @@ app.MapGet("/tickets", async (TicketDb db) =>
         .Include(t => t.Priority)
         .Include(t => t.Status)
         .Include(t => t.Category)
-        .Include(t => t.Creator)
         .Include(t => t.Asignee)
         .Include(t => t.Requester)
-        .Include(t => t.Comments)
-            .ThenInclude(c => c.User)
         .ToListAsync();
     return tickets;
 });
 
+// Gets a list of *all* tickets
+app.MapGet("/tickets/all", async (TicketDb db) =>
+{
+    var tickets = await db.Tickets
+        .Include(t => t.Priority)
+        .Include(t => t.Status)
+        .Include(t => t.Category)
+        .Include(t => t.Asignee)
+        .Include(t => t.Requester)
+        .ToListAsync();
+    return tickets;
+});
+
+// Gets a single ticket from ID including all sub tables
+app.MapGet("/tickets/{id}", async (int id, TicketDb db) =>
+{
+    var ticket = await db.Tickets.Where(t => t.ID == id)
+        .Include(t => t.Priority)
+        .Include(t => t.Status)
+        .Include(t => t.Category)
+        .Include(t => t.Creator)
+        .Include(t => t.Asignee)
+        .Include(t => t.Requester)
+        .Include(t => t.Comments)
+        .ThenInclude(c => c.User).FirstOrDefaultAsync();
+    return ticket ?? null;
+});
+
+// Updates a ticket
 app.MapPut("/tickets", async (Ticket ticket, TicketDb db) =>
 {
     db.Update(ticket);
@@ -66,6 +85,7 @@ app.MapPut("/tickets", async (Ticket ticket, TicketDb db) =>
     return HttpStatusCode.OK;
 });
 
+// Creates a new ticket
 app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
 {
     db.Add(ticket);
@@ -73,24 +93,88 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
     return HttpStatusCode.Created;
 });
 
+    #region COMMENTS
+    // Inserts a comment in a ticket, no need to have anything else than post
+    app.MapPost("/Comments", async (Comments comment, TicketDb db) =>
+        {
+            db.Add(comment);
+            await db.SaveChangesAsync();
+            return HttpStatusCode.Created;
+        });
+    #endregion
 
+#endregion
 
-app.MapPost("/Comments", async (Comments comment, TicketDb db) =>
+#region USERS
+// Lists all users
+    app.MapGet("/users", async (TicketDb db) =>
+    {
+        var users = await db.Users
+            .Include(u => u.Role)
+            .ToListAsync();
+        return users;
+    });
+
+// Updates a current user
+    app.MapPut("/users", async (User user, TicketDb db) =>
+    {
+        db.Update(user);
+        await db.SaveChangesAsync();
+        return HttpStatusCode.OK;
+    });
+
+// Creates a new user
+    app.MapPost("/users", async (User user, TicketDb db) =>
+    {
+        db.Add(user);
+        await db.SaveChangesAsync();
+        return HttpStatusCode.OK;
+    });
+#endregion
+
+#region SUB PROPERTIES
+app.MapGet("/roles", async (TicketDb db) =>
+    await db.Roles.ToListAsync());
+
+app.MapPost("/roles", async (Role role, TicketDb db) =>
 {
-    db.Add(comment);
+    db.Roles.Add(role);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
 });
 
 
+app.MapGet("/status", async (TicketDb db) =>
+    await db.Status.ToListAsync());
 
-app.MapGet("/users", async (TicketDb db) =>
+app.MapPost("/status", async (Status status, TicketDb db) =>
 {
-    var users = await db.Users
-        .Include(u => u.Role)
-        .ToListAsync();
-    return users;
+    db.Status.Add(status);
+    await db.SaveChangesAsync();
+    return HttpStatusCode.Created;
 });
 
+
+app.MapGet("/priority", async (TicketDb db) =>
+    await db.Priority.ToListAsync());
+
+app.MapPost("/priority", async (Priority priority, TicketDb db) =>
+{
+    db.Priority.Add(priority);
+    await db.SaveChangesAsync();
+    return HttpStatusCode.Created;
+});
+
+
+app.MapGet("/category", async (TicketDb db) =>
+    await db.Category.ToListAsync());
+
+app.MapPost("/category", async (Category category, TicketDb db) =>
+{
+    db.Category.Add(category);
+    await db.SaveChangesAsync();
+    return HttpStatusCode.Created;
+});
+#endregion
 
 app.Run();
