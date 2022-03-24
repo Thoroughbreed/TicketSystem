@@ -10,4 +10,6 @@ public class TicketChangelog
     public int UserID { get; set; }
     public DateTime EditedAt { get; set; }
     public string LogText { get; set; }
+
+    public User User { get; set; }
 }

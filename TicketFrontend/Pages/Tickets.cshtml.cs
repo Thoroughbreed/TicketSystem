@@ -11,7 +11,6 @@ public class Tickets : PageModel
 
     [BindProperty(SupportsGet = true)]
     public List<Ticket> FoundTickets { get; set; }
-    public Comments Comment { get; set; }
     
     public Tickets(ITicketService service)
     {
@@ -29,10 +28,5 @@ public class Tickets : PageModel
     {
         await _service.CloseTicket(ticketId, userId);
         return Page();
-    }
-
-    public async Task OnPostComment(Comments comment)
-    {
-        await _service.CreateComment(comment);
     }
 }

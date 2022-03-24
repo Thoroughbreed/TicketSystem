@@ -1,11 +1,9 @@
-﻿namespace TicketFrontend.Models;
+﻿namespace TicketFrontend.DTO;
 
-public class TicketChangelog
+public class TicketChangelogDTO
 {
-    public int ID { get; set; }
     public int TicketID { get; set; }
     public int UserID { get; set; }
     public DateTime EditedAt { get; set; }
     public string LogText { get; set; }
-    public User User { get; set; }
 }

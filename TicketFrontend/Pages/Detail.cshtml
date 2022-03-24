@@ -1,0 +1,126 @@
+﻿@page "{ticketId?}"
+@model TicketFrontend.Pages.Detail
+
+@if (Model.FoundTicket == null)
+{
+    <div class="row">
+        <div class="col-6">
+            <H3>Ingen ticket fundet - hvad gjorde du?!</H3>
+        </div>
+    </div>    
+}
+else
+{
+    <form method="post">
+        <div class="row">
+            <div class="col-6">
+                <input asp-for="FoundTicket.TCaption" hidden="true" />
+                <input asp-for="FoundTicket.ID" hidden="true" />
+                <input asp-for="FoundTicket.TRequesterID" hidden="true" />
+                <H3>@Model.FoundTicket.TCaption - #@Model.FoundTicket.ID - @Model.FoundTicket.Requester.full_name</H3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <textarea style="resize:none" rows="12" cols="75" asp-for="FoundTicket.TDesc"></textarea>
+            </div>
+            <div class="col-6">
+                <div class="row p-1 border border-info">
+                    <div class="col-12">
+                        <label>Status:</label>
+                            <input asp-for="FoundTicket.TStatusID" hidden="true"/>
+                        <select>
+                            <option>Status</option>
+                        </select>
+                        <label>Prioritet:</label>
+                            <input asp-for="FoundTicket.TPriorityID" hidden="true"/>
+                        <select>
+                            <option>Prioritet</option>
+                        </select>
+                        <label>Kategori:</label>
+                            <input asp-for="FoundTicket.TCategoryID" hidden="true"/>
+                        <select>
+                            <option>Kategori</option>
+                        </select>
+                    </div>
+                </div>
+                <hr/>
+                <input asp-for="FoundTicket.TCreatorID" hidden="true" />
+                <label>Created by: @Model.FoundTicket.Creator.display_name</label><br/>
+                <input asp-for="FoundTicket.TCreatedAt" hidden="true" />
+                <label>Created at: @Model.FoundTicket.TCreatedAt</label>
+                @if (Model.Changelogs.Count > 0)
+                {
+                    <hr/>
+                    <label>Last changed: @Model.Changelogs.OrderByDescending(c => c.EditedAt).FirstOrDefault().EditedAt</label>
+                    <br/>
+                    <label>Changed by: @Model.Changelogs.OrderByDescending(c => c.EditedAt).FirstOrDefault().User.display_name</label>
+                    <br/>
+                }
+                @if (Model.FoundTicket.TClosed)
+                {
+                    <hr/>
+                    <label>Closed: @Model.FoundTicket.TClosedAt</label><br/>
+                    <label>Closed by: @Model.FoundTicket.Closer.display_name</label><br/>
+                    <form method="post" asp-page-handler="ReOpen">
+                        <input type="submit" class="btn btn-outline-danger" value="Genåbn sag"/>
+                    </form>
+                }
+                else
+                {
+                    <hr/>
+                    <div class="row">
+                        <div class="col">
+                            <input type="submit" asp-page-handler="SaveTicket" class="btn btn-outline-warning" value="Gem ændringer"/>
+                        </div>
+                        <div class="col">
+                            <input type="submit" asp-page-handler="CloseTicket" class="btn btn-danger" value="Luk sag"/>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </form>
+    <hr/>
+<div class="row">
+    <div class="col-6">
+        <form method="post" asp-page-handler="CreateComment">
+            <H5>Kommentar</H5>
+            <input asp-for="Comment.TicketID" value="@Model.FoundTicket.ID" hidden="true" />
+            <input asp-for="Comment.UserID" value="@Model.FoundTicket.Creator.ID" hidden="true" />
+            <textarea style="resize: none" rows="3" cols="75" asp-for="Comment.Comment"></textarea>
+            <input type="submit" class="btn btn-success" value="Send" />
+        </form>
+    </div>
+</div>
+    <div class="row">
+        <div class="col-6">
+            @foreach (var comment in Model.FoundTicket.Comments)
+            {
+                <div class="row border border-info rounded m-2">
+                    <div class="col-6">
+                        <p>@comment.Comment</p>
+                    </div>
+                    <div class="col-6">
+                        <label>Created by: @comment.User.display_name</label>
+                        <label>Created at: @comment.CTime</label>
+                    </div>
+                </div>    
+            }
+        </div>
+        <div class="col-6">
+            @foreach(var log in Model.Changelogs)
+            {
+                <div class="row border border-warning rounded m-2">
+                    <div class="col-6">
+                        <p>@log.LogText</p>
+                    </div>
+                    <div class="col-6">
+                        <label>Changed by: @log.User.display_name</label>
+                        <label>Changed at: @log.EditedAt</label>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

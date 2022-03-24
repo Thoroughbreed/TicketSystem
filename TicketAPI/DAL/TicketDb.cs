@@ -13,7 +13,7 @@ public class TicketDb : DbContext
     public DbSet<Status> Status { get; set; }
     public DbSet<Subscribers> Subscribers { get; set; }
     public DbSet<Ticket> Tickets { get; set; }
-    public DbSet<TicketChangelog> TicketChangelogs { get; set; }
+    public DbSet<TicketChangelog> TicketChangelog { get; set; }
     public DbSet<User> Users { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder oB)

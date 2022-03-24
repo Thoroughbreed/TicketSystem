@@ -2,6 +2,7 @@
 
 public class TicketDTO
 {
+    public int ID { get; set; }
     public string TCaption { get; set; }
     public string TDesc { get; set; }
 

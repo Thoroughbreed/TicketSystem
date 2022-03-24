@@ -1,5 +1,7 @@
+using System.Formats.Asn1;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using TicketAPI.DAL;
 using TicketAPI.Models;
 
@@ -67,6 +69,7 @@ app.MapGet("/tickets/{id}", async (int id, TicketDb db) =>
 {
     var ticket = await db.Tickets.Where(t => t.ID == id)
         .Include(t => t.Priority)
+        .Include(t => t.Closer)
         .Include(t => t.Status)
         .Include(t => t.Category)
         .Include(t => t.Creator)
@@ -103,7 +106,27 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
         });
     #endregion
 
+    #region Changelog
+    // Updates the ticket changelog
+    app.MapGet("/Changelog/{id}", async (int id, TicketDb db) =>
+    {
+        var logs = await db.TicketChangelog
+            .Where(t => t.TicketID == id)
+            .Include(t => t.User)
+            .ToListAsync();
+        return logs;
+    });
+    
+    app.MapPost("/Changelog", async (TicketChangelog tcl, TicketDb db) =>
+    {
+        db.Add(tcl);
+        await db.SaveChangesAsync();
+        return HttpStatusCode.Created;
+    });
+    #endregion
+
 #endregion
+
 
 #region USERS
 // Lists all users
