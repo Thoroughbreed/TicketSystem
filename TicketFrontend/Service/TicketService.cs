@@ -1,4 +1,6 @@
-﻿using TicketFrontend.Models;
+﻿using System.Text.Json;
+using TicketFrontend.DTO;
+using TicketFrontend.Models;
 
 namespace TicketFrontend.Service;
 
@@ -33,8 +35,34 @@ public class TicketService : ITicketService
         await _client.PutAsJsonAsync(_ticketUrl, ticket);
     }
 
+    public async Task CreateTicket(Ticket ticket)
+    {
+        var newTicket = new TicketDTO
+        {
+            TDesc = ticket.TDesc,
+            TCaption = ticket.TCaption,
+            TCreatorID = ticket.TCreatorID,
+            TCategoryID = ticket.TCategoryID,
+            TPriorityID = ticket.TPriorityID,
+            TStatusID = 1,
+            TClosed = false,
+            TAssignedID = ticket.TAssignedID,
+            TRequesterID = ticket.TRequesterID,
+            TCreatedAt = DateTime.Now
+        };
+
+        await _client.PostAsJsonAsync(_ticketUrl, newTicket);
+    }
+
     public async Task CreateComment(Comments comment)
     {
-        await _client.PostAsJsonAsync(_commentUrl, comment);
+        var newComment = new CommentDTO
+        {
+            Comment = comment.Comment,
+            CTime = DateTime.Now,
+            TicketID = comment.TicketID,
+            UserID = comment.UserID
+        };
+        await _client.PostAsJsonAsync(_commentUrl, newComment);
     }
 }
