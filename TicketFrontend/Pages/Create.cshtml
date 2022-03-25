@@ -1,40 +1,47 @@
 ﻿@page
 @model TicketFrontend.Pages.Create
+<div class="container">
+    <div class="row">
+        <h1 class="display-4">Opret ticket</h1>
+    </div>
     <form method="post">
-        <div class="row">
-            <div class="col-6">
-                <label asp-for="newTicket.TCaption">Overskrift: </label>
-                <input asp-for="newTicket.TCaption"/>
-                <input asp-for="newTicket.ID" hidden="true"/>
-                <div class="row">
-                    <span class="text-danger" asp-validation-for="newTicket.TCaption"></span>
-                </div>
-            </div>
-        </div>
         <div class="row">
             <div class="col-6">
                 <textarea style="resize:none" rows="12" cols="75" asp-for="newTicket.TDesc"></textarea>
                 <div class="row"><span class="text-danger" asp-validation-for="newTicket.TDesc"></span></div>
             </div>
-            <div class="col-6">
-                <div class="row p-1 border border-info">
-                    <div class="col-12">
-                        <label>Prioritet:</label>
-                        <select asp-for="newTicket.TPriorityID" asp-items="@(new SelectList(Model.Priorities, "ID", "priority"))">
-                            <option>Vælg prioritet</option>
-                        </select>
-                        <label>Kategori:</label>
-                        <select asp-for="newTicket.TCategoryID" asp-items="@(new SelectList(Model.Categories, "ID", "category"))">
-                            <option>Vælg kategori</option>
-                        </select>
-                    </div>
+            <div class="col-3">
+                <div class="row">
+                    <label asp-for="newTicket.TCaption">Overskrift: </label>
+                    <input asp-for="newTicket.TCaption"/>
+                    <input asp-for="newTicket.ID" hidden="true"/>
+                </div>
+                <div class="row">
+                    <span class="text-danger" asp-validation-for="newTicket.TCaption"></span>
+                </div>
+                <div class="row">
+                    <label>Prioritet:</label>
+                    <select asp-for="newTicket.TPriorityID" asp-items="@(new SelectList(Model.Priorities, "ID", "priority"))">
+                        <option>Vælg prioritet</option>
+                    </select>
                     <div class="row"><span class="text-danger" asp-validation-for="newTicket.TPriorityID"></span></div>
+                </div>
+                <div class="row">
+                    <label>Kategori:</label>
+                    <select asp-for="newTicket.TCategoryID" asp-items="@(new SelectList(Model.Categories, "ID", "categories"))">
+                        <option>Vælg kategori</option>
+                    </select>
                     <div class="row"><span class="text-danger" asp-validation-for="newTicket.TCategoryID"></span></div>
                 </div>
-                <hr/>
-                <input asp-for="newTicket.TCreatorID"/>
-                <span class="text-danger" asp-validation-for="newTicket.TCreatorID"></span>
-                    
+                <div class="row">
+                    <label>Oprettet af:</label>
+                    <select asp-for="newTicket.TCreatorID" asp-items="@(new SelectList(Model.Users, "ID", "full_name"))">
+                        <option>Vælg bruger</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <span class="text-danger" asp-validation-for="newTicket.TCreatorID"></span>
+                </div>
                 <hr/>
                 <div class="row">
                     <div class="col">
@@ -44,7 +51,8 @@
             </div>
         </div>
     </form>
-<hr/>
+    <hr/>
+</div>
 @section scripts{
     <partial name="_ValidationScriptsPartial" />
 }

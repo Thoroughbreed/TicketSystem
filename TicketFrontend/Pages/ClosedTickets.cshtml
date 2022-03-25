@@ -22,7 +22,16 @@
         {
             <tr>
                 <td>@item.TCaption</td>
-                <td>@item.TDesc</td>
+                <td>
+                    @if (item.TDesc.Length > 40)
+                    {
+                        @item.TDesc[0..Math.Min(@item.TDesc.Length, 45)]@: ...
+                    }
+                    else
+                    {
+                        @item.TDesc
+                    }
+                </td>
                 <td>@item.TCreatedAt</td>
                 <td>@item.Requester.full_name</td>
                 <td>@item.Priority.priority</td>

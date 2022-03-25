@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using TicketFrontend.DTO;
 using TicketFrontend.Models;
 using TicketFrontend.Service;
@@ -10,11 +11,12 @@ public class Create : PageModel
 {
     private readonly ITicketService _tService;
     private readonly IPropertyService _pService;
-    
+
     [BindProperty(SupportsGet = true)] public List<Category> Categories { get; set; }
     [BindProperty(SupportsGet = true)] public List<Priority> Priorities { get; set; }
-    [BindProperty(SupportsGet = true)] public List<Status> Status { get; set; }
+    [BindProperty(SupportsGet = true)] public List<User> Users { get; set; }
     [BindProperty(SupportsGet = true)] public TicketDTO newTicket { get; set; }
+    
     
     public Create(ITicketService tService, IPropertyService pService)
     {
@@ -25,7 +27,7 @@ public class Create : PageModel
     {
         Categories = await _pService.GetCategories();
         Priorities = await _pService.GetPriority();
-        Status = await _pService.GetStatus();
+        Users = await _pService.GetUsers();
 
         return Page();
     }
@@ -37,6 +39,10 @@ public class Create : PageModel
         newTicket.TStatusID = 1;
         if (!ModelState.IsValid)
         {
+            Categories = await _pService.GetCategories();
+            Priorities = await _pService.GetPriority();
+            Users = await _pService.GetUsers();
+            
             return Page();
         }
         var newId = await _tService.CreateTicket(newTicket);
