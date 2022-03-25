@@ -16,6 +16,7 @@
         <th>Prioritet</th>
         <th>Kategori</th>
         <th>Status</th>
+        <th colspan="2"></th>
         </thead>
         @foreach (var item in @Model.FoundTickets)
         {
@@ -26,12 +27,12 @@
             <td>@item.Requester.full_name</td>
             <td>@item.Priority.priority</td>
             <td>@item.Category.category</td>
-            <td>@item.Status.status @item.TStatusID</td>
+            <td>@item.Status.status</td>
             <td>
                 <a asp-page="Detail" class="btn btn-outline-info" asp-route-ticketId="@item.ID">Detailjer</a>
             </td>
             <td>
-                <a asp-page="Index" class="btn btn-outline-danger" asp-page-handler="CloseTaskDebug" asp-route-ticketId="@item.ID" asp-route-userId="5">Tvangs luk sag</a>
+                <a asp-page="Tickets" class="btn btn-outline-danger" asp-page-handler="CloseTaskDebug" asp-route-ticketId="@item.ID" asp-route-userId="5">Tvangs luk</a>
             </td>
         </tr>
         }

@@ -28,19 +28,16 @@ else
                 <div class="row p-1 border border-info">
                     <div class="col-12">
                         <label>Status:</label>
-                            <input asp-for="FoundTicket.TStatusID" hidden="true"/>
-                        <select>
-                            <option>Status</option>
+                        <select asp-for="FoundTicket.TStatusID" asp-items="@(new SelectList(Model.Status, "ID", "status"))">
+                            <option>Vælg status</option>
                         </select>
                         <label>Prioritet:</label>
-                            <input asp-for="FoundTicket.TPriorityID" hidden="true"/>
-                        <select>
-                            <option>Prioritet</option>
+                        <select asp-for="FoundTicket.TPriorityID" asp-items="@(new SelectList(Model.Priorities, "ID", "priority"))">
+                            <option>Vælg prioritet</option>
                         </select>
                         <label>Kategori:</label>
-                            <input asp-for="FoundTicket.TCategoryID" hidden="true"/>
-                        <select>
-                            <option>Kategori</option>
+                        <select asp-for="FoundTicket.TCategoryID" asp-items="@(new SelectList(Model.Categories, "ID", "category"))">
+                            <option>Vælg kategori</option>
                         </select>
                     </div>
                 </div>

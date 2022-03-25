@@ -97,7 +97,8 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
 {
     db.Add(ticket);
     await db.SaveChangesAsync();
-    return HttpStatusCode.Created;
+    var newID = await db.Tickets.OrderByDescending(t => t.ID).FirstOrDefaultAsync();
+    return newID?.ID ?? 0;
 });
 
     #region COMMENTS

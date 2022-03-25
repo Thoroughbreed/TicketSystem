@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using TicketFrontend.Models;
 using TicketFrontend.Service;
 
@@ -9,15 +8,19 @@ namespace TicketFrontend.Pages;
 public class Detail : PageModel
 {
     private readonly ITicketService _service;
+    private readonly IPropertyService _propertyService;
 
     [BindProperty(SupportsGet = true)] public Ticket FoundTicket { get; set; }
     [BindProperty(SupportsGet = true)] public List<TicketChangelog> Changelogs { get; set; }
     [BindProperty] public Comments Comment { get; set; } = new();
+    public List<Category> Categories { get; set; }
+    public List<Priority> Priorities { get; set; }
+    public List<Status> Status { get; set; }
 
-
-    public Detail(ITicketService service)
+    public Detail(ITicketService service, IPropertyService propertyService)
     {
         _service = service;
+        _propertyService = propertyService;
     }
 
     public async Task<IActionResult> OnGet(int ticketId)
@@ -29,6 +32,10 @@ public class Detail : PageModel
             Comment.TicketID = FoundTicket.ID;
             Comment.UserID = FoundTicket.TCreatorID;
         }
+
+        Categories = await _propertyService.GetCategories();
+        Priorities = await _propertyService.GetPriority();
+        Status = await _propertyService.GetStatus();
         
         return Page();
     }

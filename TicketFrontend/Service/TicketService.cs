@@ -21,6 +21,12 @@ public class TicketService : ITicketService
         return items != null ? items.OrderByDescending(t => t.TPriorityID).ToList() : new List<Ticket>();
     }
 
+    public async Task<List<Ticket>> GetAllTickets()
+    {
+        var tickets = await _client.GetFromJsonAsync<List<Ticket>>($"{_ticketUrl}/all");
+        return tickets != null ? tickets.Where(t => t.TClosed == true).ToList() : new List<Ticket>();
+    }
+
     public async Task<Ticket?> GetTicketByID(int ticketID)
     {
         var ticket = await _client.GetFromJsonAsync<Ticket>($"{_ticketUrl}/{ticketID}");
@@ -78,23 +84,11 @@ public class TicketService : ITicketService
         });
     }
 
-    public async Task CreateTicket(Ticket ticket)
+    public async Task<string> CreateTicket(TicketDTO ticket)
     {
-        var newTicket = new TicketDTO
-        {
-            TDesc = ticket.TDesc,
-            TCaption = ticket.TCaption,
-            TCreatorID = ticket.TCreatorID,
-            TCategoryID = ticket.TCategoryID,
-            TPriorityID = ticket.TPriorityID,
-            TStatusID = 1,
-            TClosed = false,
-            TAssignedID = ticket.TAssignedID,
-            TRequesterID = ticket.TRequesterID,
-            TCreatedAt = DateTime.Now
-        };
-
-        await _client.PostAsJsonAsync(_ticketUrl, newTicket);
+        var newID = await _client.PostAsJsonAsync(_ticketUrl, ticket);
+        var returnValue = await newID.Content.ReadAsStringAsync();
+        return returnValue;
     }
 
     public async Task CreateComment(Comments comment)
