@@ -47,6 +47,7 @@ app.MapGet("/tickets", async (TicketDb db) =>
         .Include(t => t.Category)
         .Include(t => t.Asignee)
         .Include(t => t.Requester)
+        .AsNoTracking()
         .ToListAsync();
     return tickets;
 });
@@ -60,6 +61,7 @@ app.MapGet("/tickets/all", async (TicketDb db) =>
         .Include(t => t.Category)
         .Include(t => t.Asignee)
         .Include(t => t.Requester)
+        .AsNoTracking()
         .ToListAsync();
     return tickets;
 });
@@ -76,7 +78,9 @@ app.MapGet("/tickets/{id}", async (int id, TicketDb db) =>
         .Include(t => t.Asignee)
         .Include(t => t.Requester)
         .Include(t => t.Comments)
-        .ThenInclude(c => c.User).FirstOrDefaultAsync();
+        .ThenInclude(c => c.User)
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
     return ticket ?? null;
 });
 
@@ -113,6 +117,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
         var logs = await db.TicketChangelog
             .Where(t => t.TicketID == id)
             .Include(t => t.User)
+            .AsNoTracking()
             .ToListAsync();
         return logs;
     });
@@ -134,6 +139,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
     {
         var users = await db.Users
             .Include(u => u.Role)
+            .AsNoTracking()
             .ToListAsync();
         return users;
     });

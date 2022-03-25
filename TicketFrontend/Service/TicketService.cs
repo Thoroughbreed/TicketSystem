@@ -29,12 +29,30 @@ public class TicketService : ITicketService
 
     public async Task CloseTicket(int ticketId, int userId)
     {
-        var tickets = await _client.GetFromJsonAsync<List<Ticket>>(_ticketUrl);
-        var ticket = tickets.FirstOrDefault(t => t.ID == ticketId);
-        ticket.TClosedByID = userId;
-        ticket.TClosed = true;
-
-        await _client.PutAsJsonAsync(_ticketUrl, ticket);
+        var ticket = await _client.GetFromJsonAsync<Ticket>($"{_ticketUrl}/{ticketId}");
+        if (ticket == null) return;
+        var ticketDTO = new TicketDTO
+        {
+            ID = ticketId,
+            TAssignedID = ticket.TAssignedID,
+            TCaption = ticket.TCaption,
+            TCategoryID = ticket.TCategoryID,
+            TClosed = true,
+            TCreatedAt = ticket.TCreatedAt,
+            TCreatorID = ticket.TCreatorID,
+            TDesc = ticket.TDesc,
+            TPriorityID = ticket.TPriorityID,
+            TRequesterID = ticket.TRequesterID,
+            TStatusID = 7,
+            TClosedByID = 5 // #TODO HARDCODED USER VALUE
+        };
+        
+        var debugJson = JsonSerializer.Serialize(ticketDTO);
+        await _client.PutAsJsonAsync(_ticketUrl, ticketDTO);
+        await CreateChangelog(new TicketChangelog
+        {
+            LogText = "Ticket closed", TicketID = ticket.ID, UserID = (int) ticketDTO.TClosedByID
+        });
     }
 
     public async Task EditTicket(Ticket ticket)
@@ -56,7 +74,7 @@ public class TicketService : ITicketService
         await _client.PutAsJsonAsync(_ticketUrl, updatedTicket);
         await CreateChangelog(new TicketChangelog
         {
-            LogText = "Ticket changed", TicketID = ticket.ID, UserID = ticket.TCreatorID
+            LogText = "Ticket updated", TicketID = ticket.ID, UserID = ticket.TCreatorID
         });
     }
 
@@ -107,5 +125,34 @@ public class TicketService : ITicketService
             UserID = tcl.UserID
         };
         await _client.PostAsJsonAsync(_changelogUrl, newLog);
+    }
+
+    public async Task ReOpenTicket(int ticketId, int userId)
+    {       
+        var ticket = await _client.GetFromJsonAsync<Ticket>($"{_ticketUrl}/{ticketId}");
+        if (ticket == null) return;
+
+        var ticketDTO = new TicketDTO
+        {
+            ID = ticketId,
+            TAssignedID = ticket.TAssignedID,
+            TCaption = ticket.TCaption,
+            TCategoryID = ticket.TCategoryID,
+            TClosed = false,
+            TCreatedAt = ticket.TCreatedAt,
+            TCreatorID = ticket.TCreatorID,
+            TDesc = ticket.TDesc,
+            TPriorityID = ticket.TPriorityID,
+            TRequesterID = ticket.TRequesterID,
+            TStatusID = 2,
+            TClosedByID = null
+        };
+        
+        var debugJson = JsonSerializer.Serialize(ticketDTO);
+        await _client.PutAsJsonAsync(_ticketUrl, ticketDTO);
+        await CreateChangelog(new TicketChangelog
+        {
+            LogText = "Ticket reopened", TicketID = ticket.ID, UserID = userId
+        });
     }
 }

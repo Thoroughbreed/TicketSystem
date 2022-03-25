@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using TicketFrontend.Models;
 using TicketFrontend.Service;
 
@@ -28,6 +29,7 @@ public class Detail : PageModel
             Comment.TicketID = FoundTicket.ID;
             Comment.UserID = FoundTicket.TCreatorID;
         }
+        
         return Page();
     }
 
@@ -40,6 +42,18 @@ public class Detail : PageModel
     public async Task<IActionResult> OnPostCreateComment(Comments comment)
     {
         await _service.CreateComment(comment);
+        return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnPostCloseTicket()
+    {
+        await _service.CloseTicket(FoundTicket.ID, 5); // #TODO HARDCODED USER VALUE
+        return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnPostReOpen()
+    {
+        await _service.ReOpenTicket(FoundTicket.ID, 4); // #TODO HARDCODED USER VALUE
         return RedirectToPage();
     }
 }

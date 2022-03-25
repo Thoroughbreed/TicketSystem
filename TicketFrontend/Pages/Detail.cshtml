@@ -62,9 +62,7 @@ else
                     <hr/>
                     <label>Closed: @Model.FoundTicket.TClosedAt</label><br/>
                     <label>Closed by: @Model.FoundTicket.Closer.display_name</label><br/>
-                    <form method="post" asp-page-handler="ReOpen">
-                        <input type="submit" class="btn btn-outline-danger" value="Genåbn sag"/>
-                    </form>
+                        <input type="submit" asp-page-handler="ReOpen" class="btn btn-outline-danger" value="Genåbn sag"/>
                 }
                 else
                 {
@@ -87,7 +85,7 @@ else
         <form method="post" asp-page-handler="CreateComment">
             <H5>Kommentar</H5>
             <input asp-for="Comment.TicketID" value="@Model.FoundTicket.ID" hidden="true" />
-            <input asp-for="Comment.UserID" value="@Model.FoundTicket.Creator.ID" hidden="true" />
+            <input asp-for="Comment.UserID" value="@Model.FoundTicket.Creator.ID" hidden="true" /> <!-- #TODO HARDCODED USER ID -->
             <textarea style="resize: none" rows="3" cols="75" asp-for="Comment.Comment"></textarea>
             <input type="submit" class="btn btn-success" value="Send" />
         </form>

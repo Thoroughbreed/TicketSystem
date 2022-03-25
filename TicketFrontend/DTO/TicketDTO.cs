@@ -18,4 +18,5 @@ public class TicketDTO
     public int TCategoryID { get; set; }
     public int TPriorityID { get; set; }
     public int TStatusID { get; set; }
+    public int? TClosedByID { get; set; }
 }
