@@ -28,7 +28,7 @@
                 </div>
                 <div class="row">
                     <label>Kategori:</label>
-                    <select asp-for="newTicket.TCategoryID" asp-items="@(new SelectList(Model.Categories, "ID", "categories"))">
+                    <select asp-for="newTicket.TCategoryID" asp-items="@(new SelectList(Model.Categories, "ID", "category"))">
                         <option>Vælg kategori</option>
                     </select>
                     <div class="row"><span class="text-danger" asp-validation-for="newTicket.TCategoryID"></span></div>
@@ -41,6 +41,12 @@
                 </div>
                 <div class="row">
                     <span class="text-danger" asp-validation-for="newTicket.TCreatorID"></span>
+                </div>
+                <div class="row">
+                    <label>Tildel til:</label>
+                    <select asp-for="newTicket.TAssignedID" asp-items="@(new SelectList(Model.Users, "ID", "full_name"))">
+                        <option>Vælg bruger</option>
+                    </select>
                 </div>
                 <hr/>
                 <div class="row">

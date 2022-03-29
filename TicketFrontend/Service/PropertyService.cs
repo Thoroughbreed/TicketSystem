@@ -38,4 +38,41 @@ public class PropertyService : IPropertyService
         var users = await _client.GetFromJsonAsync<List<User>>(_userURL);
         return users;
     }
+
+    public async Task<User> GetUser(int id)
+    {
+        var users = await GetUsers();
+        var user = users.FirstOrDefault(u => u.ID == id);
+        return user ?? null;
+    }
+
+    public async Task CreateCategory(Category category)
+    {
+        await _client.PostAsJsonAsync(_categoryURL, category);
+    }
+
+    public async Task CreateStatus(Status status)
+    {
+        await _client.PostAsJsonAsync(_statusURL, status);
+    }
+
+    public async Task CreatePriority(Priority priority)
+    {
+        await _client.PostAsJsonAsync(_priorityURL, priority);
+    }
+
+    public async Task DeleteCategory(int id)
+    {
+        await _client.DeleteAsync($"{_categoryURL}/{id}");
+    }
+
+    public async Task DeleteStatus(int id)
+    {
+        await _client.DeleteAsync($"{_statusURL}/{id}");
+    }
+
+    public async Task DeletePriority(int id)
+    {
+        await _client.DeleteAsync($"{_priorityURL}/{id}");
+}
 }

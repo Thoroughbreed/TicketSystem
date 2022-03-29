@@ -1,0 +1,106 @@
+﻿@page
+@model TicketFrontend.Pages.Properties
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-3">
+            <div class="row">
+                <H3>Status</h3></div>
+            <div class="row">
+                <table class="table table-striped">
+                    <thead>
+                    <th>Navn</th>
+                    <th></th>
+                    </thead>
+                    @foreach (var item in @Model.Status)
+                    {
+                        <tr>
+                            <td>@item.status</td>
+                            <td>
+                                <a asp-page="Properties" class="btn btn-danger" asp-page-handler="DeleteStatus" asp-route-id="@item.ID">Slet</a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div class="row">
+                <form method="post" asp-page-handler="Status">
+                    <div class="form-group">
+                        <label asp-for="NewStatus.status">Indtast status navn:</label>
+                        <input class="form-control" type="text" asp-for="NewStatus.status"/>
+                        <span asp-validation-for="NewStatus.status" class="text-danger"></span>
+                    </div>
+                    <input type="submit" class="btn btn-outline-success" value="Opret ny"/>
+                </form>
+            </div>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-3">
+            <div class="row">
+                <H3>Prioritet</h3></div>
+            <div class="row">
+                <table class="table table-striped">
+                    <thead>
+                    <th>Navn</th>
+                    <th></th>
+                    </thead>
+                    @foreach (var item in @Model.Priorities)
+                    {
+                        <tr>
+                            <td>@item.priority</td>
+                            <td>
+                                <a asp-page="Properties" class="btn btn-danger" asp-page-handler="DeletePriority" asp-route-id="@item.ID">Slet</a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div class="row">
+                <form method="post" asp-page-handler="Priority">
+                    <div class="form-group">
+                        <label asp-for="NewPriority.priority">Indtast prioritet:</label>
+                        <input class="form-control" type="text" asp-for="NewPriority.priority"/>
+                        <span asp-validation-for="NewPriority.priority" class="text-danger"></span>
+                    </div>
+                    <input type="submit" class="btn btn-outline-success" value="Opret ny"/>
+                </form>
+            </div>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-3">
+            <div class="row">
+                <H3>Kategori</h3></div>
+            <div class="row">
+                <table class="table table-striped">
+                    <thead>
+                    <th>Navn</th>
+                    <th></th>
+                    </thead>
+                    @foreach (var item in @Model.Categories)
+                    {
+                        <tr>
+                            <td>@item.category</td>
+                            <td>
+                                <a asp-page="Properties" class="btn btn-danger" asp-page-handler="DeleteCategory" asp-route-id="@item.ID">Slet</a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div class="row">
+                <form method="post" asp-page-handler="Category">
+                    <div class="form-group">
+                        <label asp-for="NewCategory.category">Indtast kategori:</label>
+                        <input class="form-control" type="text" asp-for="NewCategory.category"/>
+                        <span asp-validation-for="NewCategory.category" class="text-danger"></span>
+                    </div>
+                    <input type="submit" class="btn btn-outline-success" value="Opret ny"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

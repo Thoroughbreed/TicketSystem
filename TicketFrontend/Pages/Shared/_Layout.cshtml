@@ -28,6 +28,15 @@
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-page="/ClosedTickets">Lukkede Tickets</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Admin panel
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" asp-page="/Properties">Properties</a>
+                            <a class="dropdown-item" asp-page="/Users">Brugere</a>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>

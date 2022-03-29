@@ -13,6 +13,8 @@ public class Detail : PageModel
     [BindProperty(SupportsGet = true)] public Ticket FoundTicket { get; set; }
     [BindProperty(SupportsGet = true)] public List<TicketChangelog> Changelogs { get; set; }
     [BindProperty] public Comments Comment { get; set; } = new();
+    [BindProperty(SupportsGet = true)] public int ProgressBar { get; set; }
+    [BindProperty(SupportsGet = true)] public string ProgressBarCol { get; set; }
     public List<Category> Categories { get; set; }
     public List<Priority> Priorities { get; set; }
     public List<Status> Status { get; set; }
@@ -31,6 +33,26 @@ public class Detail : PageModel
             Changelogs = await _service.GetLogs(FoundTicket.ID);
             Comment.TicketID = FoundTicket.ID;
             Comment.UserID = FoundTicket.TCreatorID;
+            ProgressBar = FoundTicket.TStatusID switch
+            {
+                1 => 0,
+                2 => 25,
+                3 or 4 => 50,
+                5 => 75,
+                6 => 85,
+                > 6 => 100,
+                _ => ProgressBar
+            };
+            ProgressBarCol = FoundTicket.TStatusID switch
+            {
+                1 => "bg-info",
+                2 => "bg-success",
+                3 or 4 or 5 => "bg-warning",
+                6 => "bg-info",
+                7 => "bg-success",
+                8 => "bg-danger",
+                _ => ProgressBarCol
+            };
         }
 
         Categories = await _propertyService.GetCategories();

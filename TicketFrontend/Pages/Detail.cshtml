@@ -25,20 +25,27 @@ else
                 <textarea style="resize:none" rows="12" cols="75" asp-for="FoundTicket.TDesc"></textarea>
             </div>
             <div class="col-6">
-                <div class="row p-1 border border-info">
-                    <div class="col-12">
-                        <label>Status:</label>
-                        <select asp-for="FoundTicket.TStatusID" asp-items="@(new SelectList(Model.Status, "ID", "status"))">
-                            <option>Vælg status</option>
-                        </select>
-                        <label>Prioritet:</label>
-                        <select asp-for="FoundTicket.TPriorityID" asp-items="@(new SelectList(Model.Priorities, "ID", "priority"))">
-                            <option>Vælg prioritet</option>
-                        </select>
-                        <label>Kategori:</label>
-                        <select asp-for="FoundTicket.TCategoryID" asp-items="@(new SelectList(Model.Categories, "ID", "category"))">
-                            <option>Vælg kategori</option>
-                        </select>
+                <div class="row border border-info">
+                    <div class="row m-1">
+                        <div class="col-12">
+                            <label>Status:</label>
+                            <select asp-for="FoundTicket.TStatusID" asp-items="@(new SelectList(Model.Status, "ID", "status"))">
+                                <option>Vælg status</option>
+                            </select>
+                            <label>Prioritet:</label>
+                            <select asp-for="FoundTicket.TPriorityID" asp-items="@(new SelectList(Model.Priorities, "ID", "priority"))">
+                                <option>Vælg prioritet</option>
+                            </select>
+                            <label>Kategori:</label>
+                            <select asp-for="FoundTicket.TCategoryID" asp-items="@(new SelectList(Model.Categories, "ID", "category"))">
+                                <option>Vælg kategori</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row m-1">
+                        <div class="progress">
+                            <div class="progress-bar @Model.ProgressBarCol" role="progressbar" style="width: @Model.ProgressBar%;" aria-valuenow="@Model.ProgressBar" aria-valuemin="0" aria-valuemax="100">@Model.FoundTicket.Status.status</div>
+                        </div>
                     </div>
                 </div>
                 <hr/>
@@ -46,6 +53,11 @@ else
                 <label>Created by: @Model.FoundTicket.Creator.display_name</label><br/>
                 <input asp-for="FoundTicket.TCreatedAt" hidden="true" />
                 <label>Created at: @Model.FoundTicket.TCreatedAt</label>
+                @if (Model.FoundTicket.Asignee != null)
+                {
+                    <hr/>
+                    <label>Assigned to: @Model.FoundTicket.Asignee.display_name</label>
+                }
                 @if (Model.Changelogs.Count > 0)
                 {
                     <hr/>

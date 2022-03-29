@@ -173,6 +173,14 @@ app.MapPost("/roles", async (Role role, TicketDb db) =>
     return HttpStatusCode.Created;
 });
 
+app.MapPut("/roles/{id}", async (int id, TicketDb db) =>
+{
+    var found = db.Roles.FirstOrDefault(e => e.ID == id);
+    db.Roles.Remove(found);
+    await db.SaveChangesAsync();
+    return HttpStatusCode.OK;
+});
+
 
 app.MapGet("/status", async (TicketDb db) =>
     await db.Status.ToListAsync());
@@ -182,6 +190,14 @@ app.MapPost("/status", async (Status status, TicketDb db) =>
     db.Status.Add(status);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
+});
+
+app.MapDelete("/status/{id}", async (int id, TicketDb db) =>
+{
+    var found = db.Status.FirstOrDefault(e => e.ID == id);
+    db.Status.Remove(found);
+    await db.SaveChangesAsync();
+    return HttpStatusCode.OK;
 });
 
 
@@ -195,6 +211,14 @@ app.MapPost("/priority", async (Priority priority, TicketDb db) =>
     return HttpStatusCode.Created;
 });
 
+app.MapDelete("/priority/{id}", async (int id, TicketDb db) =>
+{
+    var found = db.Priority.FirstOrDefault(e => e.ID == id);
+    db.Priority.Remove(found);
+    await db.SaveChangesAsync();
+    return HttpStatusCode.OK;
+});
+
 
 app.MapGet("/category", async (TicketDb db) =>
     await db.Category.ToListAsync());
@@ -205,6 +229,15 @@ app.MapPost("/category", async (Category category, TicketDb db) =>
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
 });
+
+app.MapDelete("/category/{id}", async (int id, TicketDb db) =>
+{
+    var found = db.Category.FirstOrDefault(e => e.ID == id);
+    db.Category.Remove(found);
+    await db.SaveChangesAsync();
+    return HttpStatusCode.OK;
+});
+
 #endregion
 
 app.Run();
