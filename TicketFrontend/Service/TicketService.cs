@@ -21,10 +21,20 @@ public class TicketService : ITicketService
         return items != null ? items.OrderByDescending(t => t.TPriorityID).ToList() : new List<Ticket>();
     }
 
+    public async Task<IQueryable<Ticket>> GetTicketsQ(int currPage, int pageSize)
+    {
+        var items = await _client.GetFromJsonAsync<IQueryable<Ticket>>($"{_ticketUrl}/{currPage}/{pageSize}");
+    }
+
     public async Task<List<Ticket>> GetAllTickets()
     {
         var tickets = await _client.GetFromJsonAsync<List<Ticket>>($"{_ticketUrl}/all");
         return tickets != null ? tickets.Where(t => t.TClosed == true).ToList() : new List<Ticket>();
+    }
+
+    public async Task<IQueryable<Ticket>> GetClosedTicketsQ()
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<Ticket?> GetTicketByID(int ticketID)

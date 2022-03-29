@@ -6,7 +6,9 @@ namespace TicketFrontend.Service;
 public interface ITicketService
 {
     public Task<List<Ticket>> GetTickets();
+    public Task<IQueryable<Ticket>> GetTicketsQ();
     public Task<List<Ticket>> GetAllTickets();
+    public Task<IQueryable<Ticket>> GetClosedTicketsQ();
     public Task<Ticket?> GetTicketByID(int ticketID);
     public Task CloseTicket(int ticketId, int userId);
     public Task ReOpenTicket(int ticketId, int userId);

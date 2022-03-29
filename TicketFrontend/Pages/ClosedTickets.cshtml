@@ -43,4 +43,19 @@
             </tr>
         }
     </table>
+    @if (Model.PageCount > Model.PageSize)
+    {
+        <ul class="pagination">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrPage ? "active" : "")">
+                    <a asp-page="./Products" class="page-link" asp-all-route-data="@(new Dictionary<string, string>{
+            { "Search", Model.Search },
+            { "CurrPage", @i.ToString() },
+            { "prodOrderOption", Model.prodOrderOption.ToString() }
+                })">@i</a>
+            </li>
+            }
+        </ul>
+    }
 </div>
