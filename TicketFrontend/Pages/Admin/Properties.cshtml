@@ -1,5 +1,5 @@
 ﻿@page
-@model TicketFrontend.Pages.Properties
+@model TicketFrontend.Pages.Admin.Properties
 
 <div class="container-fluid">
     <div class="row">
@@ -17,7 +17,7 @@
                         <tr>
                             <td>@item.status</td>
                             <td>
-                                <a asp-page="Properties" class="btn btn-danger" asp-page-handler="DeleteStatus" asp-route-id="@item.ID">Slet</a>
+                                <a asp-page="/Admin/Properties" class="btn btn-danger" asp-page-handler="DeleteStatus" asp-route-id="@item.ID">Slet</a>
                             </td>
                         </tr>
                     }
@@ -49,7 +49,7 @@
                         <tr>
                             <td>@item.priority</td>
                             <td>
-                                <a asp-page="Properties" class="btn btn-danger" asp-page-handler="DeletePriority" asp-route-id="@item.ID">Slet</a>
+                                <a asp-page="/Admin/Properties" class="btn btn-danger" asp-page-handler="DeletePriority" asp-route-id="@item.ID">Slet</a>
                             </td>
                         </tr>
                     }
@@ -81,7 +81,7 @@
                         <tr>
                             <td>@item.category</td>
                             <td>
-                                <a asp-page="Properties" class="btn btn-danger" asp-page-handler="DeleteCategory" asp-route-id="@item.ID">Slet</a>
+                                <a asp-page="/Admin/Properties" class="btn btn-danger" asp-page-handler="DeleteCategory" asp-route-id="@item.ID">Slet</a>
                             </td>
                         </tr>
                     }

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TicketFrontend.Models;
 using TicketFrontend.Service;
 
-namespace TicketFrontend.Pages;
+namespace TicketFrontend.Pages.Admin;
 
 public class Properties : PageModel
 {

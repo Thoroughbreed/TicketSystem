@@ -1,0 +1,92 @@
+﻿@page
+@model TicketFrontend.Pages.Admin.Users
+
+<div class="container">
+    <div class="row">
+        <div class="col-8">
+            <div class="row">
+                <H3>Brugere</h3></div>
+            <div class="row">
+                <table class="table table-striped">
+                    <thead>
+                    <th>Initialer</th>
+                    <th>Navn</th>
+                    <th>E-Mail</th>
+                    <th>Rolle</th>
+                    <th>Antal sager</th>
+                    <th>Oprettet d.</th>
+                    <th></th>
+                    </thead>
+                    @foreach (var item in @Model.UserList)
+                    {
+                        <tr>
+                            <td>@item.display_name</td>
+                            <td>@item.full_name</td>
+                            <td>@item.email</td>
+                            <td>@item.Role.Rolename</td>
+                            <td>
+                                @if (item.Subscriptions != null)
+                                {
+                                    @item.Subscriptions.Count
+                                }
+                                else
+                                {
+                                    @:0
+                                }
+                            </td>
+                            <td>@item.Created_At.ToString("d")</td>
+                            <td>
+                                <a asp-page="/Admin/Users" class="btn btn-outline-warning" asp-page-handler="User" asp-route-id="@item.ID">Detaljer</a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div class="row">
+                <p>
+                    @if (Model.User != null)
+                    {
+                        @Model.User.full_name
+                    }
+                    else 
+                    {
+                        @:Ingen fundet 
+                    }
+                </p>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="row">
+                <H3>Brugere</h3>
+            </div>
+            <div class="row">
+                <form method="post">
+                    <div class="form-group">
+                        <label asp-for="User.full_name"></label>
+                        <input class="form-control" asp-for="User.full_name"/>
+                        <span class="text-danger" asp-validation-for="User.full_name"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="User.display_name"></label>
+                        <input class="form-control" asp-for="User.display_name"/>
+                        <span class="text-danger" asp-validation-for="User.display_name"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="User.RoleID"></label>
+                        <select asp-for="User.RoleID" asp-items="@(new SelectList(Model.Roles, "ID", "Rolename"))">
+                            <option>Vælg bruger</option>
+                        </select>
+                        <span class="text-danger" asp-validation-for="User.RoleID"></span>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Opret bruger</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        </div>
+</div>
+
+@section scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

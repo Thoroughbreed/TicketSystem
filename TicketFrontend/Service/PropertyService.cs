@@ -1,4 +1,5 @@
-﻿using TicketFrontend.Models;
+﻿using TicketFrontend.DTO;
+using TicketFrontend.Models;
 
 namespace TicketFrontend.Service;
 
@@ -9,6 +10,7 @@ public class PropertyService : IPropertyService
     private readonly string _priorityURL  = "https://localhost:7229/priority";
     private readonly string _categoryURL = "https://localhost:7229/category";
     private readonly string _userURL = "https://localhost:7229/users";
+    private readonly string _roleURL = "https://localhost:7229/roles";
 
     public PropertyService()
     {
@@ -18,25 +20,25 @@ public class PropertyService : IPropertyService
     public async Task<List<Category>> GetCategories()
     {
         var cats = await _client.GetFromJsonAsync<List<Category>>(_categoryURL);
-        return cats;
+        return cats ?? new List<Category>();
     }
 
     public async Task<List<Status>> GetStatus()
     {
         var stats = await _client.GetFromJsonAsync<List<Status>>(_statusURL);
-        return stats;
+        return stats ?? new List<Status>();
     }
 
     public async Task<List<Priority>> GetPriority()
     {
         var prio = await _client.GetFromJsonAsync<List<Priority>>(_priorityURL);
-        return prio;
+        return prio ?? new List<Priority>();
     }
 
     public async Task<List<User>> GetUsers()
     {
         var users = await _client.GetFromJsonAsync<List<User>>(_userURL);
-        return users;
+        return users ?? new List<User>();
     }
 
     public async Task<User> GetUser(int id)
@@ -44,6 +46,12 @@ public class PropertyService : IPropertyService
         var users = await GetUsers();
         var user = users.FirstOrDefault(u => u.ID == id);
         return user ?? null;
+    }
+
+    public async Task<List<Role>> GetRoles()
+    {
+        var roles = await _client.GetFromJsonAsync<List<Role>>(_roleURL);
+        return roles ?? new List<Role>();
     }
 
     public async Task CreateCategory(Category category)
@@ -59,6 +67,11 @@ public class PropertyService : IPropertyService
     public async Task CreatePriority(Priority priority)
     {
         await _client.PostAsJsonAsync(_priorityURL, priority);
+    }
+
+    public async Task CreateUser(UserDTO user)
+    {
+        await _client.PostAsJsonAsync(_userURL, user);
     }
 
     public async Task DeleteCategory(int id)
