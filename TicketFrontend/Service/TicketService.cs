@@ -21,9 +21,13 @@ public class TicketService : ITicketService
         return items != null ? items.OrderByDescending(t => t.TPriorityID).ToList() : new List<Ticket>();
     }
 
-    public async Task<IQueryable<Ticket>> GetTicketsQ(int currPage, int pageSize)
+    public async Task<List<Ticket>> GetTicketsQ(int currPage, int pageSize)
     {
-        var items = await _client.GetFromJsonAsync<IQueryable<Ticket>>($"{_ticketUrl}/{currPage}/{pageSize}");
+        var items = await _client.GetFromJsonAsync<List<Ticket>>(_ticketUrl);
+        return items != null ? items.OrderByDescending(t => t.TPriorityID)
+            .Skip((currPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToList() : new List<Ticket>();
     }
 
     public async Task<List<Ticket>> GetAllTickets()
@@ -32,9 +36,13 @@ public class TicketService : ITicketService
         return tickets != null ? tickets.Where(t => t.TClosed == true).ToList() : new List<Ticket>();
     }
 
-    public async Task<IQueryable<Ticket>> GetClosedTicketsQ()
+    public async Task<List<Ticket>> GetClosedTicketsQ(int currPage, int pageSize)
     {
-        throw new NotImplementedException();
+        var items = await _client.GetFromJsonAsync<List<Ticket>>($"{_ticketUrl}/all");
+        return items != null ? items.OrderByDescending(t => t.TPriorityID)
+            .Skip((currPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToList() : new List<Ticket>();
     }
 
     public async Task<Ticket?> GetTicketByID(int ticketID)

@@ -52,19 +52,6 @@ app.MapGet("/tickets", async (TicketDb db) =>
     return tickets;
 });
 
-app.MapGet("/tickets/{currPage}/{pageSize}", async (int currPage, int pageSize, TicketDb db) =>
-{
-    var tickets = db.Tickets
-        .Where(t => t.TClosed == false)
-        .Include(t => t.Priority)
-        .Include(t => t.Status)
-        .Include(t => t.Category)
-        .Include(t => t.Asignee)
-        .Include(t => t.Requester)
-        .AsNoTracking();
-    return tickets;
-});
-
 // Gets a list of *all* tickets
 app.MapGet("/tickets/all", async (TicketDb db) =>
 {

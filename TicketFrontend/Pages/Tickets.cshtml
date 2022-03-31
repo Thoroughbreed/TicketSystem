@@ -16,7 +16,11 @@
         <th>Prioritet</th>
         <th>Kategori</th>
         <th>Status</th>
-        <th colspan="2"></th>
+        <th colspan="2">
+            <a asp-page="Print/Open">
+                <i class="fa fa-print"></i>
+            </a>
+        </th>
         </thead>
         @foreach (var item in @Model.FoundTickets)
         {
@@ -52,10 +56,8 @@
             @for (int i = 1; i <= Model.TotalPages; i++)
             {
                 <li class="page-item @(i == Model.CurrPage ? "active" : "")">
-                    <a asp-page="./Products" class="page-link" asp-all-route-data="@(new Dictionary<string, string>{
-            { "Search", Model.Search },
-            { "CurrPage", @i.ToString() },
-            { "prodOrderOption", Model.prodOrderOption.ToString() }
+                    <a asp-page="./Tickets" class="page-link" asp-all-route-data="@(new Dictionary<string, string>{
+                                                                                       { "CurrPage", @i.ToString() }
                 })">@i</a>
             </li>
             }

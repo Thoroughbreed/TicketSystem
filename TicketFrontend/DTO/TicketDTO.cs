@@ -1,9 +1,13 @@
-﻿namespace TicketFrontend.DTO;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TicketFrontend.DTO;
 
 public class TicketDTO
 {
     public int ID { get; set; }
+    [MaxLength(25)]
     public string TCaption { get; set; }
+    [MaxLength(250)]
     public string TDesc { get; set; }
 
     public DateTime TCreatedAt { get; set; }

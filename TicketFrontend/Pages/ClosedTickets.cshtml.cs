@@ -9,8 +9,11 @@ public class ClosedTickets : PageModel
 {
     private readonly ITicketService _service;
 
-    [BindProperty(SupportsGet = true)]
-    public List<Ticket> FoundTickets { get; set; }
+    [BindProperty(SupportsGet = true)] public List<Ticket> FoundTickets { get; set; }
+    [BindProperty(SupportsGet = true)] public int CurrPage { get; set; } = 1;
+    public int PageCount { get; set; }
+    public int PageSize { get; set; } = 15;
+    public int TotalPages => (int)Math.Ceiling(decimal.Divide(PageCount, PageSize));
 
     public ClosedTickets(ITicketService service)
     {
@@ -18,7 +21,10 @@ public class ClosedTickets : PageModel
     }
     public async Task<IActionResult> OnGet()
     {
-        FoundTickets = await _service.GetAllTickets();
+        
+        var pageCount = await _service.GetAllTickets();
+        PageCount = pageCount.Count;
+        FoundTickets = await _service.GetClosedTicketsQ(CurrPage, PageSize);
         return Page();
     }
 }

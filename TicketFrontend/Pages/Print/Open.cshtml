@@ -1,0 +1,72 @@
+﻿@page
+@model TicketFrontend.Pages.Print.Open
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/TicketFrontend.styles.css" asp-append-version="true"/>
+    <title>Print lukkede</title>
+</head>
+<body>
+<div>
+    <table>
+        <thead>
+        <th>Titel</th>
+        <th>Beskrivelse</th>
+        <th>Oprettet den</th>
+        <th>Anmoder</th>
+        <th>Prioritet</th>
+        <th>Tildelt</th>
+        <th>Kategori</th>
+        <th>Status</th>
+        </thead>
+        @foreach (var item in Model.Tickets)
+        {
+            <tr class="border border-1">
+                <td class="border border-end p-1">
+                    @if (item.TCaption.Length > 24)
+                    {
+                        @item.TCaption[0..Math.Min(@item.TCaption.Length, 25)]@: ...
+                    }
+                    else
+                    {
+                        @item.TCaption
+                    }</td>
+                <td class="border border-end p-1">
+                    @if (item.TDesc.Length > 39)
+                    {
+                        @item.TDesc[0..Math.Min(@item.TDesc.Length, 40)]@: ...
+                    }
+                    else
+                    {
+                        @item.TDesc
+                    }
+                </td>
+                <td class="border border-end p-1">@item.TCreatedAt.ToString("d")</td>
+                <td class="border border-end p-1">@item.Requester.full_name</td>
+                <td class="border border-end p-1">@item.Priority.priority</td>
+                <td class="border border-end p-1">
+                    @if (item.Asignee != null)
+                    {
+                        @item.Asignee.display_name   
+                    }
+                    else
+                    {
+                        @:Ingen
+                    }
+                </td>
+                <td class="border border-end p-1">@item.Category.category</td>
+                <td class="border border-end p-1">@item.Status.status</td>
+            </tr>
+        }
+    </table>
+</div>
+</body>
+</html>

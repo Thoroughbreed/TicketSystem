@@ -1,0 +1,89 @@
+﻿@page
+@model TicketFrontend.Pages.Print.Closed
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/TicketFrontend.styles.css" asp-append-version="true"/>
+    <title>Print lukkede</title>
+</head>
+<body>
+<div>
+    <table>
+        <thead>
+        <th>Titel</th>
+        <th>Beskrivelse</th>
+        <th>Oprettet den</th>
+        <th>Anmoder</th>
+        <th>Prioritet</th>
+        <th>Tildelt</th>
+        <th>Kategori</th>
+        <th>Status</th>
+        <th>Lukket af</th>
+        <th>Lukket den</th>
+        </thead>
+        @foreach (var item in Model.Tickets)
+        {
+            <tr class="border border-1">
+                <td class="border border-end p-1">
+                    @if (item.TCaption.Length > 19)
+                    {
+                        @item.TCaption[0..Math.Min(@item.TCaption.Length, 20)]@: ...
+                    }
+                    else
+                    {
+                        @item.TCaption
+                    }</td>
+                <td class="border border-end p-1">
+                    @if (item.TDesc.Length > 29)
+                    {
+                        @item.TDesc[0..Math.Min(@item.TDesc.Length, 30)]@: ...
+                    }
+                    else
+                    {
+                        @item.TDesc
+                    }
+                </td>
+                <td class="border border-end p-1">@item.TCreatedAt.ToString("d")</td>
+                <td class="border border-end p-1">@item.Requester.full_name</td>
+                <td class="border border-end p-1">@item.Priority.priority</td>
+                <td class="border border-end p-1">
+                    @if (item.Asignee != null)
+                    {
+                        @item.Asignee.display_name   
+                    }
+                    else
+                    {
+                        @:Ingen
+                    }
+                </td>
+                <td class="border border-end p-1">@item.Category.category</td>
+                <td class="border border-end p-1">@item.Status.status</td>
+                <td class="border border-end p-1">
+                    @if (item.Closer != null)
+                    {
+                        @item.Closer.display_name                        
+                    }
+                    else
+                    {
+                        @:Ingen 
+                    }
+                </td>
+                <td class="p-1">
+                    @if (item.TClosedAt.HasValue)
+                    {
+                        @item.TClosedAt.Value.ToString("d") 
+                    }
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+</body>
+</html>

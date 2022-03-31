@@ -5,9 +5,10 @@ namespace TicketFrontend.Models;
 public class Ticket
 {
     public int ID { get; set; }
+    [MaxLength(25)]
     public string TCaption { get; set; }
+    [MaxLength(250)]
     public string TDesc { get; set; }
-
     public DateTime TCreatedAt { get; set; }
     public DateTime? TClosedAt { get; set; }
     public bool TClosed { get; set; }
