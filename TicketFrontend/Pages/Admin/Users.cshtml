@@ -36,11 +36,28 @@
                             </td>
                             <td>@item.Created_At.ToString("d")</td>
                             <td>
-                                <a asp-page="/Admin/Users" class="btn btn-outline-warning" asp-page-handler="User" asp-route-id="@item.ID">Detaljer</a>
+                                <button type="button"
+                                        class="btn btn-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal"
+                                        data-id="@item.ID"
+                                        data-fn="@item.full_name"
+                                        data-dn="@item.display_name"
+                                        data-rid="@item.RoleID">
+                                    Detaljer
+                                </button>
                             </td>
                         </tr>
                     }
                 </table>
+            </div>
+            <div class="row">
+                <button type="button"
+                        class="btn btn-outline-success text-black"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editModal">
+                    Opret bruger
+                </button>
             </div>
             <div class="row">
                 <p>
@@ -55,36 +72,47 @@
                 </p>
             </div>
         </div>
-        <div class="col-4">
-            <div class="row">
-                <H3>Brugere</h3>
-            </div>
-            <div class="row">
-                <form method="post">
-                    <div class="form-group">
-                        <label asp-for="User.full_name"></label>
-                        <input class="form-control" asp-for="User.full_name"/>
-                        <span class="text-danger" asp-validation-for="User.full_name"></span>
+    </div>
+    
+    
+    <!-- MODAL EDIT/CREATE -->
+    <form asp-page-handler="EditModal" method="post">
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Edit item</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="User.display_name"></label>
-                        <input class="form-control" asp-for="User.display_name"/>
-                        <span class="text-danger" asp-validation-for="User.display_name"></span>
+                    <div class="modal-body">
+                        <input class="item-id" type="hidden" asp-for="@Model.User.ID"/>
+                        <div class="form-group">
+                            <label asp-for="@Model.User.full_name"></label>
+                            <input asp-for="@Model.User.full_name" class="form-control item-fName"/>
+                            <span asp-validation-for="@Model.User.full_name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.User.display_name"></label>
+                            <input class="item-dName form-control" asp-for="@Model.User.display_name"/>
+                            <span asp-validation-for="@Model.User.display_name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.User.RoleID"></label>
+                            <select asp-for="User.RoleID" asp-items="@(new SelectList(Model.Roles, "ID", "Rolename"))" class="item-roleID">
+                            </select>
+                            <span asp-validation-for="@Model.User.RoleID" class="text-danger"></span>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="User.RoleID"></label>
-                        <select asp-for="User.RoleID" asp-items="@(new SelectList(Model.Roles, "ID", "Rolename"))">
-                            <option>Vælg bruger</option>
-                        </select>
-                        <span class="text-danger" asp-validation-for="User.RoleID"></span>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuller</button>
+                        <button type="submit" class="btn btn-primary">Gem</button>
                     </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-success">Opret bruger</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
-        </div>
+    </form>
 </div>
 
 @section scripts{

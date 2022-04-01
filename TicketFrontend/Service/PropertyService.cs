@@ -74,6 +74,22 @@ public class PropertyService : IPropertyService
         await _client.PostAsJsonAsync(_userURL, user);
     }
 
+    public async Task UpdateUser(UserDTO user, int ID)
+    {
+        var editUser = new UserEditDTO
+        {
+            ID = ID,
+            password = user.password,
+            display_name = user.display_name,
+            email = user.email,
+            full_name = user.full_name,
+            RoleID = user.RoleID,
+            Created_At = user.Created_At
+        };
+        
+        await _client.PutAsJsonAsync(_userURL, editUser);
+    }
+
     public async Task DeleteCategory(int id)
     {
         await _client.DeleteAsync($"{_categoryURL}/{id}");

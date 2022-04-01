@@ -32,7 +32,7 @@ public class Users : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostEditModal()
     {
         var newUser = new UserDTO
         {
@@ -43,7 +43,17 @@ public class Users : PageModel
             password = "123456",
             RoleID = User.RoleID
         };
-        await _pService.CreateUser(newUser);
+        
+        switch (User.ID)
+        {
+            case > 0:
+                await _pService.UpdateUser(newUser, User.ID);
+                break;
+            case < 1:
+                await _pService.CreateUser(newUser);
+                break;
+        }
+
         return RedirectToPage();
     }
 }

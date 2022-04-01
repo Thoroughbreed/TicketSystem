@@ -15,6 +15,7 @@ public interface IPropertyService
     public Task CreateStatus(Status status);
     public Task CreatePriority(Priority priority);
     public Task CreateUser(UserDTO user);
+    public Task UpdateUser(UserDTO user, int ID);
     public Task DeleteCategory(int id);
     public Task DeleteStatus(int id);
     public Task DeletePriority(int id);

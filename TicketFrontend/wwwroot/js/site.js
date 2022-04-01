@@ -1,4 +1,14 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿$('#editModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var itemID = button.data('id')
+    var itemfName = button.data('fn')
+    var itemdName = button.data('dn')
+    var itemRole = button.data('rid')
 
-// Write your JavaScript code.
+    var modal = $(this)
+    
+    modal.find('.item-id').val(itemID)
+    modal.find('.item-dName').val(itemdName)
+    modal.find('.item-fName').val(itemfName)
+    modal.find('.item-roleID').val(itemRole)
+})
