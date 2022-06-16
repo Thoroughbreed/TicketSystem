@@ -1,4 +1,5 @@
 using TicketFrontend.Service;
+using Auth0.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IPropertyService, PropertyService>();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.None;
+});
+builder.Services.AddAuth0WebAppAuthentication(options =>
+{
+    options.Domain = builder.Configuration["Auth0:Domain"];
+    options.ClientId = builder.Configuration["Auth0:ClientID"];
+    options.ClientSecret = builder.Configuration["Auth0:ClientSecret"];
+    options.Scope = "openid profile email roles";
+}).WithAccessToken(options =>
+{
+    options.Audience = builder.Configuration["Auth0:Audience"];
+});
 
 var app = builder.Build();
 
@@ -22,6 +37,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();

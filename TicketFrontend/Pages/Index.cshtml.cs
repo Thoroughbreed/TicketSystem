@@ -21,12 +21,12 @@ public class IndexModel : PageModel
     
     public async Task<IActionResult> OnGet()
     {
-        var closed = await _service.GetAllTickets();
-        var open = await _service.GetTickets();
-        Closed = closed.Count;
-        Paused = open.Count(t => t.TStatusID is 3 or 4 or 5);
-        Open = open.Count(t => t.TStatusID is 1 or 2);
-        Resolved = open.Count(t => t.TStatusID is 6 or 8);
+        // var closed = await _service.GetAllTickets();
+        // var open = await _service.GetTickets();
+        // Closed = closed.Count;
+        // Paused = open.Count(t => t.TStatusID is 3 or 4 or 5);
+        // Open = open.Count(t => t.TStatusID is 1 or 2);
+        // Resolved = open.Count(t => t.TStatusID is 6 or 8);
         return Page();
     }
 

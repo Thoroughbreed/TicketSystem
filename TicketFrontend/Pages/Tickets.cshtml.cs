@@ -22,6 +22,7 @@ public class Tickets : PageModel
     
     public async Task<IActionResult> OnGet()
     {
+        var test = User;
         var pageCount = await _service.GetTickets();
         PageCount = pageCount.Count;
         FoundTickets = await _service.GetTicketsQ(CurrPage, PageSize);
