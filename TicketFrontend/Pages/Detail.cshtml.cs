@@ -64,6 +64,7 @@ public class Detail : PageModel
 
     public async Task<IActionResult> OnPostSaveTicket()
     {
+        if (FoundTicket.TStatusID is 3 or 4 or 5) FoundTicket.TPriorityID = 1;
         await _service.EditTicket(FoundTicket);
         return RedirectToPage();
     }
