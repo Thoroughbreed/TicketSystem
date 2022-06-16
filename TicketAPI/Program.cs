@@ -1,5 +1,7 @@
 using System.Formats.Asn1;
 using System.Net;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using TicketAPI.DAL;
@@ -13,13 +15,28 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddDbContext<TicketDb>();
 
-// Uncomment lines below to use authentication roles for API
-// builder.Services.AddAuthorization(options =>
-// {
-//     options.AddPolicy("R", policy => policy.RequireAuthenticatedUser().RequireClaim("permissions", "ticket:read"));
-//     options.AddPolicy("E", policy => policy.RequireAuthenticatedUser().RequireClaim("permissions", "ticket:write"));
-// });
-
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.Authority = "https://tved-it.eu.auth0.com/";
+    options.Audience = "https://localhost:8443/";
+});
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Read",
+        policy => policy.RequireAuthenticatedUser().RequireClaim("permission", "read:open_tickets"));
+    options.AddPolicy("ReadAll",
+        policy => policy.RequireAuthenticatedUser().RequireClaim("permission", "read:all_tickets"));
+    options.AddPolicy("Write",
+        policy => policy.RequireAuthenticatedUser().RequireClaim("permission", "write:tickets"));
+    options.AddPolicy("Admin",
+        policy => policy.RequireAuthenticatedUser().RequireClaim("permission", "admin:admin"));
+    options.AddPolicy("Sudo",
+        policy => policy.RequireAuthenticatedUser().RequireClaim("permission", "admin:superuser"));
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,8 +47,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 // Uncomment line below to use authentication for API
-// app.UseAuthentication();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World!");
@@ -50,7 +68,7 @@ app.MapGet("/tickets", async (TicketDb db) =>
         .AsNoTracking()
         .ToListAsync();
     return tickets;
-});
+}).RequireAuthorization("Read");
 
 // Gets a list of *all* tickets
 app.MapGet("/tickets/all", async (TicketDb db) =>
@@ -64,7 +82,7 @@ app.MapGet("/tickets/all", async (TicketDb db) =>
         .AsNoTracking()
         .ToListAsync();
     return tickets;
-});
+}).RequireAuthorization("ReadAll");
 
 // Gets a single ticket from ID including all sub tables
 app.MapGet("/tickets/{id}", async (int id, TicketDb db) =>
@@ -82,7 +100,7 @@ app.MapGet("/tickets/{id}", async (int id, TicketDb db) =>
         .AsNoTracking()
         .FirstOrDefaultAsync();
     return ticket ?? null;
-});
+}).RequireAuthorization("Read");
 
 // Updates a ticket
 app.MapPut("/tickets", async (Ticket ticket, TicketDb db) =>
@@ -90,7 +108,7 @@ app.MapPut("/tickets", async (Ticket ticket, TicketDb db) =>
     db.Update(ticket);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-});
+}).RequireAuthorization("Write");
 
 // Creates a new ticket
 app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
@@ -99,7 +117,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
     await db.SaveChangesAsync();
     var newID = await db.Tickets.OrderByDescending(t => t.ID).FirstOrDefaultAsync();
     return newID?.ID ?? 0;
-});
+}).RequireAuthorization("Write");
 
     #region COMMENTS
     // Inserts a comment in a ticket, no need to have anything else than post
@@ -108,7 +126,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
             db.Add(comment);
             await db.SaveChangesAsync();
             return HttpStatusCode.Created;
-        });
+        }).RequireAuthorization("Write");
     #endregion
 
     #region Changelog
@@ -121,14 +139,14 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
             .AsNoTracking()
             .ToListAsync();
         return logs;
-    });
+    }).RequireAuthorization("Read");
     
     app.MapPost("/Changelog", async (TicketChangelog tcl, TicketDb db) =>
     {
         db.Add(tcl);
         await db.SaveChangesAsync();
         return HttpStatusCode.Created;
-    });
+    }).RequireAuthorization("Write");
     #endregion
 
 #endregion
@@ -143,7 +161,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
             .AsNoTracking()
             .ToListAsync();
         return users;
-    });
+    }).RequireAuthorization("Read");
 
 // Updates a current user
     app.MapPut("/users", async (User user, TicketDb db) =>
@@ -151,7 +169,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
         db.Update(user);
         await db.SaveChangesAsync();
         return HttpStatusCode.OK;
-    });
+    }).RequireAuthorization("Write");
 
 // Creates a new user
     app.MapPost("/users", async (User user, TicketDb db) =>
@@ -159,19 +177,19 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
         db.Add(user);
         await db.SaveChangesAsync();
         return HttpStatusCode.OK;
-    });
+    }).RequireAuthorization("Sudo");
 #endregion
 
 #region SUB PROPERTIES
 app.MapGet("/roles", async (TicketDb db) =>
-    await db.Roles.ToListAsync());
+    await db.Roles.ToListAsync()).RequireAuthorization("Read");
 
 app.MapPost("/roles", async (Role role, TicketDb db) =>
 {
     db.Roles.Add(role);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-});
+}).RequireAuthorization("Sudo");
 
 app.MapPut("/roles/{id}", async (int id, TicketDb db) =>
 {
@@ -179,18 +197,18 @@ app.MapPut("/roles/{id}", async (int id, TicketDb db) =>
     db.Roles.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-});
+}).RequireAuthorization("Sudo");
 
 
 app.MapGet("/status", async (TicketDb db) =>
-    await db.Status.ToListAsync());
+    await db.Status.ToListAsync()).RequireAuthorization("Read");
 
 app.MapPost("/status", async (Status status, TicketDb db) =>
 {
     db.Status.Add(status);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-});
+}).RequireAuthorization("Sudo");
 
 app.MapDelete("/status/{id}", async (int id, TicketDb db) =>
 {
@@ -198,18 +216,18 @@ app.MapDelete("/status/{id}", async (int id, TicketDb db) =>
     db.Status.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-});
+}).RequireAuthorization("Admin");
 
 
 app.MapGet("/priority", async (TicketDb db) =>
-    await db.Priority.ToListAsync());
+    await db.Priority.ToListAsync()).RequireAuthorization("Read");
 
 app.MapPost("/priority", async (Priority priority, TicketDb db) =>
 {
     db.Priority.Add(priority);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-});
+}).RequireAuthorization("Sudo");
 
 app.MapDelete("/priority/{id}", async (int id, TicketDb db) =>
 {
@@ -217,18 +235,18 @@ app.MapDelete("/priority/{id}", async (int id, TicketDb db) =>
     db.Priority.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-});
+}).RequireAuthorization("Admin");
 
 
 app.MapGet("/category", async (TicketDb db) =>
-    await db.Category.ToListAsync());
+    await db.Category.ToListAsync()).RequireAuthorization("Read");
 
 app.MapPost("/category", async (Category category, TicketDb db) =>
 {
     db.Category.Add(category);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-});
+}).RequireAuthorization("Sudo");
 
 app.MapDelete("/category/{id}", async (int id, TicketDb db) =>
 {
@@ -236,7 +254,7 @@ app.MapDelete("/category/{id}", async (int id, TicketDb db) =>
     db.Category.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-});
+}).RequireAuthorization("Admin");
 
 #endregion
 
