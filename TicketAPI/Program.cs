@@ -75,7 +75,7 @@ app.MapGet("/tickets", async (TicketDb db) =>
         .AsNoTracking()
         .ToListAsync();
     return tickets;
-}).RequireAuthorization();
+});
 
 // Gets a list of *all* tickets
 app.MapGet("/tickets/all", async (TicketDb db) =>
@@ -89,7 +89,7 @@ app.MapGet("/tickets/all", async (TicketDb db) =>
         .AsNoTracking()
         .ToListAsync();
     return tickets;
-}).RequireAuthorization();
+});
 
 // Gets a single ticket from ID including all sub tables
 app.MapGet("/tickets/{id}", async (int id, TicketDb db) =>
@@ -107,7 +107,7 @@ app.MapGet("/tickets/{id}", async (int id, TicketDb db) =>
         .AsNoTracking()
         .FirstOrDefaultAsync();
     return ticket ?? null;
-}).RequireAuthorization();
+});
 
 // Updates a ticket
 app.MapPut("/tickets", async (Ticket ticket, TicketDb db) =>
@@ -115,7 +115,7 @@ app.MapPut("/tickets", async (Ticket ticket, TicketDb db) =>
     db.Update(ticket);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-}).RequireAuthorization();
+});
 
 // Creates a new ticket
 app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
@@ -124,7 +124,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
     await db.SaveChangesAsync();
     var newID = await db.Tickets.OrderByDescending(t => t.ID).FirstOrDefaultAsync();
     return newID?.ID ?? 0;
-}).RequireAuthorization();
+});
 
     #region COMMENTS
     // Inserts a comment in a ticket, no need to have anything else than post
@@ -133,7 +133,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
             db.Add(comment);
             await db.SaveChangesAsync();
             return HttpStatusCode.Created;
-        }).RequireAuthorization();
+        });
     #endregion
 
     #region Changelog
@@ -146,14 +146,14 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
             .AsNoTracking()
             .ToListAsync();
         return logs;
-    }).RequireAuthorization();
+    });
     
     app.MapPost("/Changelog", async (TicketChangelog tcl, TicketDb db) =>
     {
         db.Add(tcl);
         await db.SaveChangesAsync();
         return HttpStatusCode.Created;
-    }).RequireAuthorization();
+    });
     #endregion
 
 #endregion
@@ -168,7 +168,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
             .AsNoTracking()
             .ToListAsync();
         return users;
-    }).RequireAuthorization();
+    });
 
 // Updates a current user
     app.MapPut("/users", async (User user, TicketDb db) =>
@@ -176,7 +176,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
         db.Update(user);
         await db.SaveChangesAsync();
         return HttpStatusCode.OK;
-    }).RequireAuthorization();
+    });
 
 // Creates a new user
     app.MapPost("/users", async (User user, TicketDb db) =>
@@ -184,19 +184,19 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
         db.Add(user);
         await db.SaveChangesAsync();
         return HttpStatusCode.OK;
-    }).RequireAuthorization();
+    });
 #endregion
 
 #region SUB PROPERTIES
 app.MapGet("/roles", async (TicketDb db) =>
-    await db.Roles.ToListAsync()).RequireAuthorization();
+    await db.Roles.ToListAsync());
 
 app.MapPost("/roles", async (Role role, TicketDb db) =>
 {
     db.Roles.Add(role);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-}).RequireAuthorization();
+});
 
 app.MapPut("/roles/{id}", async (int id, TicketDb db) =>
 {
@@ -204,18 +204,18 @@ app.MapPut("/roles/{id}", async (int id, TicketDb db) =>
     db.Roles.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-}).RequireAuthorization();
+});
 
 
 app.MapGet("/status", async (TicketDb db) =>
-    await db.Status.ToListAsync()).RequireAuthorization();
+    await db.Status.ToListAsync());
 
 app.MapPost("/status", async (Status status, TicketDb db) =>
 {
     db.Status.Add(status);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-}).RequireAuthorization();
+});
 
 app.MapDelete("/status/{id}", async (int id, TicketDb db) =>
 {
@@ -223,18 +223,18 @@ app.MapDelete("/status/{id}", async (int id, TicketDb db) =>
     db.Status.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-}).RequireAuthorization();
+});
 
 
 app.MapGet("/priority", async (TicketDb db) =>
-    await db.Priority.ToListAsync()).RequireAuthorization();
+    await db.Priority.ToListAsync());
 
 app.MapPost("/priority", async (Priority priority, TicketDb db) =>
 {
     db.Priority.Add(priority);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-}).RequireAuthorization();
+});
 
 app.MapDelete("/priority/{id}", async (int id, TicketDb db) =>
 {
@@ -242,18 +242,18 @@ app.MapDelete("/priority/{id}", async (int id, TicketDb db) =>
     db.Priority.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-}).RequireAuthorization();
+});
 
 
 app.MapGet("/category", async (TicketDb db) =>
-    await db.Category.ToListAsync()).RequireAuthorization();
+    await db.Category.ToListAsync());
 
 app.MapPost("/category", async (Category category, TicketDb db) =>
 {
     db.Category.Add(category);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-}).RequireAuthorization();
+});
 
 app.MapDelete("/category/{id}", async (int id, TicketDb db) =>
 {
@@ -261,7 +261,7 @@ app.MapDelete("/category/{id}", async (int id, TicketDb db) =>
     db.Category.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-}).RequireAuthorization();
+});
 
 #endregion
 
