@@ -1,12 +1,17 @@
 using TicketFrontend.Service;
 using Auth0.AspNetCore.Authentication;
+using TicketAPI.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddHttpClient<ITicketService, TicketService>();
+builder.Services.AddHttpClient<IPropertyService, PropertyService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IPropertyService, PropertyService>();
+builder.Services.AddRazorPages();
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.SameSite = SameSiteMode.None;

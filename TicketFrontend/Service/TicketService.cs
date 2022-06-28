@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http.Headers;
+using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
 using TicketFrontend.DTO;
 using TicketFrontend.Models;
 
@@ -7,23 +9,36 @@ namespace TicketFrontend.Service;
 public class TicketService : ITicketService
 {
     private HttpClient _client;
-    private readonly string _ticketUrl = "https://localhost:7229/tickets";
-    private readonly string _commentUrl = "https://localhost:7229/comments";
-    private readonly string _changelogUrl  = "https://localhost:7229/changelog";
+    private IHttpContextAccessor _httpContextAccessor;
 
-    public TicketService()
+
+    public TicketService(IHttpContextAccessor httpContextAccessor, HttpClient client)
     {
-        _client = new HttpClient();
+        _client = client;
+        _httpContextAccessor = httpContextAccessor;
+        HttpClientHandler clientHandler = new();
+        clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, SslPolicyErrors) => true;
     }
+    
+    public async Task<string> InitializeHttpClient()
+    {
+        var BearerToken = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
+        var debug = await _httpContextAccessor.HttpContext.GetTokenAsync("id_token");
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", BearerToken);
+        return BearerToken;
+    }
+    
     public async Task<List<Ticket>> GetTickets()
     {
-        var items = await _client.GetFromJsonAsync<List<Ticket>>(_ticketUrl);
+        await InitializeHttpClient();
+        var items = await _client.GetFromJsonAsync<List<Ticket>>(AppConstants._ticketUrl);
         return items != null ? items.OrderByDescending(t => t.TPriorityID).ToList() : new List<Ticket>();
     }
 
     public async Task<List<Ticket>> GetTicketsQ(int currPage, int pageSize)
     {
-        var items = await _client.GetFromJsonAsync<List<Ticket>>(_ticketUrl);
+        await InitializeHttpClient();
+        var items = await _client.GetFromJsonAsync<List<Ticket>>(AppConstants._ticketUrl);
         return items != null ? items.OrderByDescending(t => t.TPriorityID)
             .Skip((currPage - 1) * pageSize)
             .Take(pageSize)
@@ -32,13 +47,15 @@ public class TicketService : ITicketService
 
     public async Task<List<Ticket>> GetAllTickets()
     {
-        var tickets = await _client.GetFromJsonAsync<List<Ticket>>($"{_ticketUrl}/all");
+        await InitializeHttpClient();
+        var tickets = await _client.GetFromJsonAsync<List<Ticket>>($"{AppConstants._ticketUrl}/all");
         return tickets != null ? tickets.Where(t => t.TClosed == true).ToList() : new List<Ticket>();
     }
 
     public async Task<List<Ticket>> GetClosedTicketsQ(int currPage, int pageSize)
     {
-        var items = await _client.GetFromJsonAsync<List<Ticket>>($"{_ticketUrl}/all");
+        await InitializeHttpClient();
+        var items = await _client.GetFromJsonAsync<List<Ticket>>($"{AppConstants._ticketUrl}/all");
         return items != null ? items.OrderByDescending(t => t.TPriorityID)
             .Skip((currPage - 1) * pageSize)
             .Take(pageSize)
@@ -47,13 +64,15 @@ public class TicketService : ITicketService
 
     public async Task<Ticket?> GetTicketByID(int ticketID)
     {
-        var ticket = await _client.GetFromJsonAsync<Ticket>($"{_ticketUrl}/{ticketID}");
+        await InitializeHttpClient();
+        var ticket = await _client.GetFromJsonAsync<Ticket>($"{AppConstants._ticketUrl}/{ticketID}");
         return ticket ?? null;
     }
 
     public async Task CloseTicket(int ticketId, int userId)
     {
-        var ticket = await _client.GetFromJsonAsync<Ticket>($"{_ticketUrl}/{ticketId}");
+        await InitializeHttpClient();
+        var ticket = await _client.GetFromJsonAsync<Ticket>($"{AppConstants._ticketUrl}/{ticketId}");
         if (ticket == null) return;
         var ticketDTO = new TicketDTO
         {
@@ -72,7 +91,7 @@ public class TicketService : ITicketService
         };
         
         var debugJson = JsonSerializer.Serialize(ticketDTO);
-        await _client.PutAsJsonAsync(_ticketUrl, ticketDTO);
+        await _client.PutAsJsonAsync(AppConstants._ticketUrl, ticketDTO);
         await CreateChangelog(new TicketChangelog
         {
             LogText = "Ticket closed", TicketID = ticket.ID, UserID = (int) ticketDTO.TClosedByID
@@ -81,6 +100,7 @@ public class TicketService : ITicketService
 
     public async Task EditTicket(Ticket ticket)
     {
+        await InitializeHttpClient();
         var updatedTicket = new TicketDTO
         {
             ID = ticket.ID,
@@ -95,7 +115,7 @@ public class TicketService : ITicketService
             TCreatorID = ticket.TCreatorID,
             TRequesterID = ticket.TRequesterID
         };
-        await _client.PutAsJsonAsync(_ticketUrl, updatedTicket);
+        await _client.PutAsJsonAsync(AppConstants._ticketUrl, updatedTicket);
         await CreateChangelog(new TicketChangelog
         {
             LogText = "Ticket updated", TicketID = ticket.ID, UserID = ticket.TCreatorID
@@ -104,13 +124,15 @@ public class TicketService : ITicketService
 
     public async Task<string> CreateTicket(TicketDTO ticket)
     {
-        var newID = await _client.PostAsJsonAsync(_ticketUrl, ticket);
+        await InitializeHttpClient();
+        var newID = await _client.PostAsJsonAsync(AppConstants._ticketUrl, ticket);
         var returnValue = await newID.Content.ReadAsStringAsync();
         return returnValue;
     }
 
     public async Task CreateComment(Comments comment)
     {
+        await InitializeHttpClient();
         var newComment = new CommentDTO
         {
             Comment = comment.Comment,
@@ -118,17 +140,19 @@ public class TicketService : ITicketService
             TicketID = comment.TicketID,
             UserID = comment.UserID
         };
-        await _client.PostAsJsonAsync(_commentUrl, newComment);
+        await _client.PostAsJsonAsync(AppConstants._commentUrl, newComment);
     }
 
     public Task<List<TicketChangelog>> GetLogs(int id)
     {
-        var logs = _client.GetFromJsonAsync<List<TicketChangelog>>($"{_changelogUrl}/{id}");
+        InitializeHttpClient().WaitAsync(CancellationToken.None);
+        var logs = _client.GetFromJsonAsync<List<TicketChangelog>>($"{AppConstants._changelogUrl}/{id}");
         return logs;
     }
 
     public async Task CreateChangelog(TicketChangelog tcl)
     {
+        await InitializeHttpClient();
         var newLog = new TicketChangelogDTO
         {
             EditedAt = DateTime.Now,
@@ -136,12 +160,13 @@ public class TicketService : ITicketService
             TicketID = tcl.TicketID,
             UserID = tcl.UserID
         };
-        await _client.PostAsJsonAsync(_changelogUrl, newLog);
+        await _client.PostAsJsonAsync(AppConstants._changelogUrl, newLog);
     }
 
     public async Task ReOpenTicket(int ticketId, int userId)
     {       
-        var ticket = await _client.GetFromJsonAsync<Ticket>($"{_ticketUrl}/{ticketId}");
+        await InitializeHttpClient();
+        var ticket = await _client.GetFromJsonAsync<Ticket>($"{AppConstants._ticketUrl}/{ticketId}");
         if (ticket == null) return;
 
         var ticketDTO = new TicketDTO
@@ -161,7 +186,7 @@ public class TicketService : ITicketService
         };
         
         var debugJson = JsonSerializer.Serialize(ticketDTO);
-        await _client.PutAsJsonAsync(_ticketUrl, ticketDTO);
+        await _client.PutAsJsonAsync(AppConstants._ticketUrl, ticketDTO);
         await CreateChangelog(new TicketChangelog
         {
             LogText = "Ticket reopened", TicketID = ticket.ID, UserID = userId

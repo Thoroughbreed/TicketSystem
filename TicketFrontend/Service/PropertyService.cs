@@ -1,4 +1,7 @@
-﻿using TicketFrontend.DTO;
+﻿using System.Net.Http.Headers;
+using System.Net.Security;
+using Microsoft.AspNetCore.Authentication;
+using TicketFrontend.DTO;
 using TicketFrontend.Models;
 
 namespace TicketFrontend.Service;
@@ -6,38 +9,48 @@ namespace TicketFrontend.Service;
 public class PropertyService : IPropertyService
 {
     private HttpClient _client;
-    private readonly string _statusURL = "https://localhost:7229/status";
-    private readonly string _priorityURL  = "https://localhost:7229/priority";
-    private readonly string _categoryURL = "https://localhost:7229/category";
-    private readonly string _userURL = "https://localhost:7229/users";
-    private readonly string _roleURL = "https://localhost:7229/roles";
-
-    public PropertyService()
+    private IHttpContextAccessor _httpContextAccessor;
+    
+    public PropertyService(IHttpContextAccessor httpContextAccessor, HttpClient client)
     {
-        _client = new HttpClient();
+        _client = client;
+        _httpContextAccessor = httpContextAccessor;
+        HttpClientHandler clientHandler = new();
+        clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, SslPolicyErrors) => true;
+    }
+    
+    public async Task<string> InitializeHttpClient()
+    {
+        var BearerToken = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", BearerToken);
+        return BearerToken;
     }
 
     public async Task<List<Category>> GetCategories()
     {
-        var cats = await _client.GetFromJsonAsync<List<Category>>(_categoryURL);
+        await InitializeHttpClient();
+        var cats = await _client.GetFromJsonAsync<List<Category>>(AppConstants._categoryURL);
         return cats ?? new List<Category>();
     }
 
     public async Task<List<Status>> GetStatus()
     {
-        var stats = await _client.GetFromJsonAsync<List<Status>>(_statusURL);
+        await InitializeHttpClient();
+        var stats = await _client.GetFromJsonAsync<List<Status>>(AppConstants._statusURL);
         return stats ?? new List<Status>();
     }
 
     public async Task<List<Priority>> GetPriority()
     {
-        var prio = await _client.GetFromJsonAsync<List<Priority>>(_priorityURL);
+        await InitializeHttpClient();
+        var prio = await _client.GetFromJsonAsync<List<Priority>>(AppConstants._priorityURL);
         return prio ?? new List<Priority>();
     }
 
     public async Task<List<User>> GetUsers()
     {
-        var users = await _client.GetFromJsonAsync<List<User>>(_userURL);
+        await InitializeHttpClient();
+        var users = await _client.GetFromJsonAsync<List<User>>(AppConstants._userURL);
         return users ?? new List<User>();
     }
 
@@ -50,32 +63,38 @@ public class PropertyService : IPropertyService
 
     public async Task<List<Role>> GetRoles()
     {
-        var roles = await _client.GetFromJsonAsync<List<Role>>(_roleURL);
+        await InitializeHttpClient();
+        var roles = await _client.GetFromJsonAsync<List<Role>>(AppConstants._roleURL);
         return roles ?? new List<Role>();
     }
 
     public async Task CreateCategory(Category category)
     {
-        await _client.PostAsJsonAsync(_categoryURL, category);
+        await InitializeHttpClient();
+        await _client.PostAsJsonAsync(AppConstants._categoryURL, category);
     }
 
     public async Task CreateStatus(Status status)
     {
-        await _client.PostAsJsonAsync(_statusURL, status);
+        await InitializeHttpClient();
+        await _client.PostAsJsonAsync(AppConstants._statusURL, status);
     }
 
     public async Task CreatePriority(Priority priority)
     {
-        await _client.PostAsJsonAsync(_priorityURL, priority);
+        await InitializeHttpClient();
+        await _client.PostAsJsonAsync(AppConstants._priorityURL, priority);
     }
 
     public async Task CreateUser(UserDTO user)
     {
-        await _client.PostAsJsonAsync(_userURL, user);
+        await InitializeHttpClient();
+        await _client.PostAsJsonAsync(AppConstants._userURL, user);
     }
 
     public async Task UpdateUser(UserDTO user, int ID)
     {
+        await InitializeHttpClient();
         var editUser = new UserEditDTO
         {
             ID = ID,
@@ -87,21 +106,24 @@ public class PropertyService : IPropertyService
             Created_At = user.Created_At
         };
         
-        await _client.PutAsJsonAsync(_userURL, editUser);
+        await _client.PutAsJsonAsync(AppConstants._userURL, editUser);
     }
 
     public async Task DeleteCategory(int id)
     {
-        await _client.DeleteAsync($"{_categoryURL}/{id}");
+        await InitializeHttpClient();
+        await _client.DeleteAsync($"{AppConstants._categoryURL}/{id}");
     }
 
     public async Task DeleteStatus(int id)
     {
-        await _client.DeleteAsync($"{_statusURL}/{id}");
+        await InitializeHttpClient();
+        await _client.DeleteAsync($"{AppConstants._statusURL}/{id}");
     }
 
     public async Task DeletePriority(int id)
     {
-        await _client.DeleteAsync($"{_priorityURL}/{id}");
-}
+        await InitializeHttpClient();
+        await _client.DeleteAsync($"{AppConstants._priorityURL}/{id}");
+    }
 }

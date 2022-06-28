@@ -1,10 +1,9 @@
-using System.Formats.Asn1;
 using System.Net;
 using System.Security.Claims;
+using System.IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.IdentityModel.Tokens;
 using TicketAPI.DAL;
 using TicketAPI.Models;
@@ -16,12 +15,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddDbContext<TicketDb>();
-string domain = $"https://{builder.Configuration["Auth0:Domain"]}";
+string domain = $"https://{builder.Configuration["Auth0:Domain"]}/";
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.Authority = domain;
-        options.Audience = builder.Configuration["Auto0:Audience"];
+        options.Audience = builder.Configuration["Auth0:Audience"];
         options.TokenValidationParameters = new TokenValidationParameters
         {
             NameClaimType = ClaimTypes.NameIdentifier
@@ -29,17 +28,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Read",
-        policy => policy.RequireAuthenticatedUser().RequireClaim("permission", "read:open_tickets"));
-    options.AddPolicy("ReadAll",
-        policy => policy.RequireAuthenticatedUser().RequireClaim("permission", "read:all_tickets"));
-    options.AddPolicy("Write",
-        policy => policy.RequireAuthenticatedUser().RequireClaim("permission", "write:tickets"));
-    options.AddPolicy("Admin",
-        policy => policy.RequireAuthenticatedUser().RequireClaim("permission", "admin:admin"));
-    options.AddPolicy("Sudo",
-        policy => policy.RequireAuthenticatedUser().RequireClaim("permission", "admin:superuser"));
+    // options.AddPolicy("T", policy => policy.RequireRole("Sudo"));
+    // // options.AddPolicy("TEST2", policy => policy.RequireAuthenticatedUser().RequireRole("Sudo"));
+    // options.AddPolicy("R", policy => policy.RequireAuthenticatedUser().RequireClaim("permissions", "ticket:read"));
+    // options.AddPolicy("W", policy => policy.RequireAuthenticatedUser().RequireClaim("permissions", "ticket:write"));
+    // options.AddPolicy("A", policy => policy.RequireAuthenticatedUser().RequireClaim("permissions", "ticket:admin"));
 });
+
+builder.Services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -48,6 +45,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(o =>
+{
+    o.AllowAnyOrigin();
+    o.AllowAnyHeader();
+    o.AllowAnyMethod();
+});
 
 app.UseHttpsRedirection();
 
@@ -71,7 +75,7 @@ app.MapGet("/tickets", async (TicketDb db) =>
         .AsNoTracking()
         .ToListAsync();
     return tickets;
-}).RequireAuthorization("Read");
+}).RequireAuthorization();
 
 // Gets a list of *all* tickets
 app.MapGet("/tickets/all", async (TicketDb db) =>
@@ -85,7 +89,7 @@ app.MapGet("/tickets/all", async (TicketDb db) =>
         .AsNoTracking()
         .ToListAsync();
     return tickets;
-}).RequireAuthorization("ReadAll");
+}).RequireAuthorization();
 
 // Gets a single ticket from ID including all sub tables
 app.MapGet("/tickets/{id}", async (int id, TicketDb db) =>
@@ -103,7 +107,7 @@ app.MapGet("/tickets/{id}", async (int id, TicketDb db) =>
         .AsNoTracking()
         .FirstOrDefaultAsync();
     return ticket ?? null;
-}).RequireAuthorization("Read");
+}).RequireAuthorization();
 
 // Updates a ticket
 app.MapPut("/tickets", async (Ticket ticket, TicketDb db) =>
@@ -111,7 +115,7 @@ app.MapPut("/tickets", async (Ticket ticket, TicketDb db) =>
     db.Update(ticket);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-}).RequireAuthorization("Write");
+}).RequireAuthorization();
 
 // Creates a new ticket
 app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
@@ -120,7 +124,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
     await db.SaveChangesAsync();
     var newID = await db.Tickets.OrderByDescending(t => t.ID).FirstOrDefaultAsync();
     return newID?.ID ?? 0;
-}).RequireAuthorization("Write");
+}).RequireAuthorization();
 
     #region COMMENTS
     // Inserts a comment in a ticket, no need to have anything else than post
@@ -129,7 +133,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
             db.Add(comment);
             await db.SaveChangesAsync();
             return HttpStatusCode.Created;
-        }).RequireAuthorization("Write");
+        }).RequireAuthorization();
     #endregion
 
     #region Changelog
@@ -142,14 +146,14 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
             .AsNoTracking()
             .ToListAsync();
         return logs;
-    }).RequireAuthorization("Read");
+    }).RequireAuthorization();
     
     app.MapPost("/Changelog", async (TicketChangelog tcl, TicketDb db) =>
     {
         db.Add(tcl);
         await db.SaveChangesAsync();
         return HttpStatusCode.Created;
-    }).RequireAuthorization("Write");
+    }).RequireAuthorization();
     #endregion
 
 #endregion
@@ -164,7 +168,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
             .AsNoTracking()
             .ToListAsync();
         return users;
-    }).RequireAuthorization("Read");
+    }).RequireAuthorization();
 
 // Updates a current user
     app.MapPut("/users", async (User user, TicketDb db) =>
@@ -172,7 +176,7 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
         db.Update(user);
         await db.SaveChangesAsync();
         return HttpStatusCode.OK;
-    }).RequireAuthorization("Write");
+    }).RequireAuthorization();
 
 // Creates a new user
     app.MapPost("/users", async (User user, TicketDb db) =>
@@ -180,19 +184,19 @@ app.MapPost("/tickets", async (Ticket ticket, TicketDb db) =>
         db.Add(user);
         await db.SaveChangesAsync();
         return HttpStatusCode.OK;
-    }).RequireAuthorization("Sudo");
+    }).RequireAuthorization();
 #endregion
 
 #region SUB PROPERTIES
 app.MapGet("/roles", async (TicketDb db) =>
-    await db.Roles.ToListAsync()).RequireAuthorization("Read");
+    await db.Roles.ToListAsync()).RequireAuthorization();
 
 app.MapPost("/roles", async (Role role, TicketDb db) =>
 {
     db.Roles.Add(role);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-}).RequireAuthorization("Sudo");
+}).RequireAuthorization();
 
 app.MapPut("/roles/{id}", async (int id, TicketDb db) =>
 {
@@ -200,18 +204,18 @@ app.MapPut("/roles/{id}", async (int id, TicketDb db) =>
     db.Roles.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-}).RequireAuthorization("Sudo");
+}).RequireAuthorization();
 
 
 app.MapGet("/status", async (TicketDb db) =>
-    await db.Status.ToListAsync()).RequireAuthorization("Read");
+    await db.Status.ToListAsync()).RequireAuthorization();
 
 app.MapPost("/status", async (Status status, TicketDb db) =>
 {
     db.Status.Add(status);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-}).RequireAuthorization("Sudo");
+}).RequireAuthorization();
 
 app.MapDelete("/status/{id}", async (int id, TicketDb db) =>
 {
@@ -219,18 +223,18 @@ app.MapDelete("/status/{id}", async (int id, TicketDb db) =>
     db.Status.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-}).RequireAuthorization("Admin");
+}).RequireAuthorization();
 
 
 app.MapGet("/priority", async (TicketDb db) =>
-    await db.Priority.ToListAsync()).RequireAuthorization("Read");
+    await db.Priority.ToListAsync()).RequireAuthorization();
 
 app.MapPost("/priority", async (Priority priority, TicketDb db) =>
 {
     db.Priority.Add(priority);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-}).RequireAuthorization("Sudo");
+}).RequireAuthorization();
 
 app.MapDelete("/priority/{id}", async (int id, TicketDb db) =>
 {
@@ -238,18 +242,18 @@ app.MapDelete("/priority/{id}", async (int id, TicketDb db) =>
     db.Priority.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-}).RequireAuthorization("Admin");
+}).RequireAuthorization();
 
 
 app.MapGet("/category", async (TicketDb db) =>
-    await db.Category.ToListAsync()).RequireAuthorization("Read");
+    await db.Category.ToListAsync()).RequireAuthorization();
 
 app.MapPost("/category", async (Category category, TicketDb db) =>
 {
     db.Category.Add(category);
     await db.SaveChangesAsync();
     return HttpStatusCode.Created;
-}).RequireAuthorization("Sudo");
+}).RequireAuthorization();
 
 app.MapDelete("/category/{id}", async (int id, TicketDb db) =>
 {
@@ -257,8 +261,39 @@ app.MapDelete("/category/{id}", async (int id, TicketDb db) =>
     db.Category.Remove(found);
     await db.SaveChangesAsync();
     return HttpStatusCode.OK;
-}).RequireAuthorization("Admin");
+}).RequireAuthorization();
 
 #endregion
 
 app.Run();
+
+public abstract class HasScopeRequirement : IAuthorizationRequirement
+{
+    public string Issuer { get; }
+    public string Scope { get; }
+
+    protected HasScopeRequirement(string scope, string issuer)
+    {
+        Scope = scope ?? throw new ArgumentNullException(nameof(scope));
+        Issuer = issuer ?? throw new ArgumentNullException(nameof(issuer));
+    }
+}
+
+public class HasScopeHandler : AuthorizationHandler<HasScopeRequirement>
+{
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, HasScopeRequirement requirement)
+    {
+        // If user does not have the scope claim, get out of here
+        if (!context.User.HasClaim(c => c.Type == "scope" && c.Issuer == requirement.Issuer))
+            return Task.CompletedTask;
+
+        // Split the scopes string into an array
+        var scopes = context.User.FindFirst(c => c.Type == "scope" && c.Issuer == requirement.Issuer).Value.Split(' ');
+
+        // Succeed if the scope array contains the required scope
+        if (scopes.Any(s => s == requirement.Scope))
+            context.Succeed(requirement);
+
+        return Task.CompletedTask;
+    }
+}
