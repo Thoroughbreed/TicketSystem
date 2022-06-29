@@ -72,7 +72,7 @@ else
                     {
                         <hr/>
                         <label>Closed: @Model.FoundTicket.TClosedAt</label><br/>
-                        <label>Closed by: @Model.FoundTicket.Closer.ID</label><br/>
+                        <label>Closed by: @Model.FoundTicket.Closer.display_name</label><br/>
                             <input type="submit" asp-page-handler="ReOpen" class="btn btn-outline-danger" value="Genåbn sag"/>
                     }
                     else

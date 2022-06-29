@@ -59,8 +59,8 @@ public class TicketService : ITicketService
     {
         await InitializeHttpClient();
         var items = await _client.GetFromJsonAsync<List<Ticket>>(AppConstants._ticketUrl);
-
-        return string.IsNullOrWhiteSpace(search) ? items.AsQueryable() : items.Where(t => t.TDesc.Contains(search) || t.TCaption.Contains(search) || t.ID.Equals(search)).AsQueryable();
+        int.TryParse(search, out var intSearch);
+        return string.IsNullOrWhiteSpace(search) ? items.AsQueryable() : items.Where(t => t.TDesc.Contains(search) || t.TCaption.Contains(search) || t.ID.Equals(intSearch)).AsQueryable();
     }
 
     public async Task<List<Ticket>> GetAllTickets()
@@ -75,9 +75,11 @@ public class TicketService : ITicketService
         await InitializeHttpClient();
         var items = await _client.GetFromJsonAsync<List<Ticket>>($"{AppConstants._ticketUrl}/all");
 
+        int.TryParse(search, out var intSearch);
+        
         return string.IsNullOrWhiteSpace(search)
             ? items.AsQueryable()
-            : items.Where(t => t.TDesc.Contains(search) || t.TCaption.Contains(search) || t.ID.Equals(search))
+            : items.Where(t => t.TDesc.Contains(search) || t.TCaption.Contains(search) || t.ID.Equals(intSearch))
                 .AsQueryable();
     }
 
@@ -124,6 +126,7 @@ public class TicketService : ITicketService
             TCategoryID = ticket.TCategoryID,
             TClosed = true,
             TCreatedAt = ticket.TCreatedAt,
+            TClosedAt = DateTime.Now,
             TCreatorID = ticket.TCreatorID,
             TDesc = ticket.TDesc,
             TPriorityID = ticket.TPriorityID,
@@ -224,7 +227,8 @@ public class TicketService : ITicketService
             TPriorityID = ticket.TPriorityID,
             // TRequesterID = ticket.TRequesterID,
             TStatusID = userId,
-            TClosedByID = null
+            TClosedByID = null,
+            TClosedAt = null
         };
         
         var debugJson = JsonSerializer.Serialize(ticketDTO);

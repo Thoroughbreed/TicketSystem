@@ -11,6 +11,7 @@ public class TicketDTO
     public string TDesc { get; set; }
 
     public DateTime TCreatedAt { get; set; }
+    public DateTime? TClosedAt { get; set; }
     public bool TClosed { get; set; }
 
     // User

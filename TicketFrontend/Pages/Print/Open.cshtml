@@ -18,6 +18,7 @@
 <div>
     <table>
         <thead>
+        <th>ID</th>
         <th>Titel</th>
         <th>Beskrivelse</th>
         <th>Oprettet den</th>
@@ -28,6 +29,7 @@
         @foreach (var item in Model.Tickets)
         {
             <tr class="border border-1">
+                <td class="border border-end p-1">@item.ID</td>
                 <td class="border border-end p-1">
                     @if (item.TCaption.Length > 24)
                     {

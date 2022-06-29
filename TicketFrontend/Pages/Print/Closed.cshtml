@@ -17,6 +17,7 @@
 <div>
     <table>
         <thead>
+        <th>ID</th>
         <th>Titel</th>
         <th>Beskrivelse</th>
         <th>Oprettet den</th>
@@ -31,6 +32,7 @@
         @foreach (var item in Model.Tickets)
         {
             <tr class="border border-1">
+                <td class="border border-end p-1">@item.ID</td>
                 <td class="border border-end p-1">
                     @if (item.TCaption.Length > 19)
                     {
@@ -39,7 +41,8 @@
                     else
                     {
                         @item.TCaption
-                    }</td>
+                    }
+                </td>
                 <td class="border border-end p-1">
                     @if (item.TDesc.Length > 29)
                     {
@@ -68,7 +71,7 @@
                 <td class="border border-end p-1">
                     @if (item.Closer != null)
                     {
-                        @item.Closer.display_name                        
+                        @item.Closer.display_name
                     }
                     else
                     {
@@ -78,7 +81,7 @@
                 <td class="p-1">
                     @if (item.TClosedAt.HasValue)
                     {
-                        @item.TClosedAt.Value.ToString("d") 
+                        @item.TClosedAt.Value.ToString("d")
                     }
                 </td>
             </tr>
