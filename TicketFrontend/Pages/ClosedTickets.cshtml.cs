@@ -21,6 +21,7 @@ public class ClosedTickets : PageModel
     }
     public async Task<IActionResult> OnGet()
     {
+        if (!User.Identity.IsAuthenticated) return RedirectToPage("Account/Login");
         
         var pageCount = await _service.GetAllTickets();
         PageCount = pageCount.Count;

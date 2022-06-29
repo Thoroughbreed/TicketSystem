@@ -8,6 +8,9 @@ namespace TicketFrontend.Pages;
 public class Tickets : PageModel
 {
     private readonly ITicketService _service;
+    
+    [BindProperty(SupportsGet = true)] public string Search { get; set; }
+    [BindProperty(SupportsGet = true)] public TicketOrderOptions orderOptions { get; set; }
 
     [BindProperty(SupportsGet = true)] public List<Ticket> FoundTickets { get; set; }
     [BindProperty(SupportsGet = true)] public int CurrPage { get; set; } = 1;
@@ -22,10 +25,11 @@ public class Tickets : PageModel
     
     public async Task<IActionResult> OnGet()
     {
-        var test = User;
-        var pageCount = await _service.GetTickets();
-        PageCount = pageCount.Count;
-        FoundTickets = await _service.GetTicketsQ(CurrPage, PageSize);
+        if (!User.Identity.IsAuthenticated) return RedirectToPage("Account/Login");
+
+        var pageCount = await _service.GetTicketsQ(Search);
+        PageCount = pageCount.Count();
+        FoundTickets = await _service.GetTicketsQ(CurrPage, PageSize, orderOptions, Search);
         return Page();
     }
     

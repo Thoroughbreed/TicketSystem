@@ -1,4 +1,5 @@
 ﻿@page
+@using TicketFrontend.Service
 @model TicketFrontend.Pages.Tickets
 @{
     ViewData["Title"] = "Tickets";
@@ -7,6 +8,31 @@
 
 <div class="text-center">
     <h1 class="display-4">Open tickets</h1>
+        <form method="get" id="searchForm">
+            <div class="row">
+                <div class="row">
+                    <div class="col-9">
+                        
+                    </div>
+                    <div class="col-3">
+                        <label asp-for="orderOptions">Sorter på: </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-group mb-3 col-9">
+                        <input type="search" asp-for="Search" class="form-control" placeholder="Søg på titel eller beskrivelse">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="submit">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                        <div class="input-group-append col-3">
+                            <select asp-for="orderOptions" asp-items="Html.GetEnumSelectList<TicketOrderOptions>()" class="accordion" onchange="searchForm.submit()"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
     <table class="table table-striped">
         <thead>
         <th>Titel</th>
@@ -42,10 +68,13 @@
                 <td>@item.Category.category</td>
                 <td>@item.Status.status</td>
                 <td>
-                    <a asp-page="Detail" class="btn btn-outline-info" asp-route-ticketId="@item.ID">Detailjer</a>
+                    <a asp-page="Detail" class="btn btn-outline-info" asp-route-ticketId="@item.ID">Detaljer</a>
                 </td>
                 <td>
-                    <a asp-page="Tickets" class="btn btn-outline-danger" asp-page-handler="CloseTaskDebug" asp-route-ticketId="@item.ID" asp-route-userId="5">Tvangs luk</a>
+                    @if (User.HasClaim("https://tved.it/accessToken/roles", "TicketWrite"))
+                    {
+                        <a asp-page="Tickets" class="btn btn-outline-danger" asp-page-handler="CloseTaskDebug" asp-route-ticketId="@item.ID" asp-route-userId="5">Tvangs luk</a>
+                    }
                 </td>
             </tr>
         }

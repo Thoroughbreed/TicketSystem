@@ -29,6 +29,8 @@ public class Detail : PageModel
 
     public async Task<IActionResult> OnGet(int ticketId)
     {
+        if (!User.Identity.IsAuthenticated) return RedirectToPage("Account/Login");
+        
         var _ul = await _propertyService.GetUsers();
         UserID = _ul.FirstOrDefault(u => u.email == User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value).ID;
         FoundTicket = await _service.GetTicketByID(ticketId);

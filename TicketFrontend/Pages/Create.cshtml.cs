@@ -25,6 +25,7 @@ public class Create : PageModel
     }
     public async Task<IActionResult> OnGet()
     {
+        if (!User.Identity.IsAuthenticated) return RedirectToPage("Account/Login");
         Categories = await _pService.GetCategories();
         Priorities = await _pService.GetPriority();
         Users = await _pService.GetUsers();

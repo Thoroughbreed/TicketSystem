@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using TicketFrontend.DTO;
 using TicketFrontend.Models;
 
@@ -43,6 +44,23 @@ public class TicketService : ITicketService
             .Skip((currPage - 1) * pageSize)
             .Take(pageSize)
             .ToList() : new List<Ticket>();
+    }
+    
+    public async Task<List<Ticket>> GetTicketsQ(int currPage, int pageSize, TicketOrderOptions options, string search = null)
+    {
+        var q = await GetTicketsQ(search);
+        return q.OrderByOptions(options)
+            .Skip((currPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    public async Task<IQueryable<Ticket>> GetTicketsQ(string? search)
+    {
+        await InitializeHttpClient();
+        var items = await _client.GetFromJsonAsync<List<Ticket>>(AppConstants._ticketUrl);
+
+        return string.IsNullOrWhiteSpace(search) ? items.AsQueryable() : items.Where(t => t.TDesc.Contains(search) || t.TCaption.Contains(search) || t.ID.Equals(search)).AsQueryable();
     }
 
     public async Task<List<Ticket>> GetAllTickets()

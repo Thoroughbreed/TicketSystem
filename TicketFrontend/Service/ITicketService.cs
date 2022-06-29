@@ -6,7 +6,9 @@ namespace TicketFrontend.Service;
 public interface ITicketService
 {
     public Task<List<Ticket>> GetTickets();
+    public Task<IQueryable<Ticket>> GetTicketsQ(string? search);
     public Task<List<Ticket>> GetTicketsQ(int currPage, int pageSize);
+    public Task<List<Ticket>> GetTicketsQ(int currPage, int pageSize, TicketOrderOptions options, string search = null);
     public Task<List<Ticket>> GetAllTickets();
     public Task<List<Ticket>> GetClosedTicketsQ(int currPage, int pageSize);
     public Task<Ticket?> GetTicketByID(int ticketID);

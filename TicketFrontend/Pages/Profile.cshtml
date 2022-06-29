@@ -1,7 +1,7 @@
 ﻿@page "{id?}"
 @model TicketFrontend.Pages.Profile
 
-@if (Model.User == null)
+@if (Model._user == null)
 {
     <div class="row">
         <div class="col-6">
@@ -10,26 +10,26 @@
     </div>    
 }
 else {
-    <h2>@Model.User.full_name</h2>
+    <h2>@Model._user.full_name</h2>
 
     <dl class="row">
         <dt class="col-sm-2">
             E-Mail
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.User.email)
+            @Html.DisplayFor(model => model._user.email)
         </dd>
         <dt class="col-sm-2">
             Initialer
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.User.display_name)
+            @Html.DisplayFor(model => model._user.display_name)
         </dd>
         <dt class="col-sm-2">
             Brugerrolle
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.User.Role.Rolename)
+            @Html.DisplayFor(model => model._user.Role.Rolename)
         </dd>
     </dl>
     <div class="row">
@@ -38,9 +38,9 @@ else {
                     class="btn btn-outline-success"
                     data-bs-toggle="modal"
                     data-bs-target="#editModal"
-                    data-id="@Model.User.ID"
-                    data-fn="@Model.User.full_name"
-                    data-dn="@Model.User.display_name">
+                    data-id="@Model._user.ID"
+                    data-fn="@Model._user.full_name"
+                    data-dn="@Model._user.display_name">
                 Rediger
             </button>
         </div>
@@ -59,19 +59,19 @@ else {
                         </button>
                     </div>
                     <div class="modal-body">
-                        <input class="item-id" type="hidden" asp-for="@Model.User.ID"/>
+                        <input class="item-id" type="hidden" asp-for="@Model._user.ID"/>
                         <div class="form-group">
-                            <label asp-for="@Model.User.full_name"></label>
-                            <input asp-for="@Model.User.full_name" class="form-control item-fName"/>
-                            <span asp-validation-for="@Model.User.full_name" class="text-danger"></span>
+                            <label asp-for="@Model._user.full_name"></label>
+                            <input asp-for="@Model._user.full_name" class="form-control item-fName"/>
+                            <span asp-validation-for="@Model._user.full_name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="@Model.User.display_name"></label>
-                            <input class="item-dName form-control" asp-for="@Model.User.display_name"/>
-                            <span asp-validation-for="@Model.User.display_name" class="text-danger"></span>
+                            <label asp-for="@Model._user.display_name"></label>
+                            <input class="item-dName form-control" asp-for="@Model._user.display_name"/>
+                            <span asp-validation-for="@Model._user.display_name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="@Model.User.password"></label>
+                            <label asp-for="@Model._user.password"></label>
                             <input class="form-control" asp-for="@Model.Password" type="password" />
                             <input class="form-control" asp-for="@Model.ConfirmPassword" type="password" />
                             <span asp-validation-for="@Model.ConfirmPassword" class="text-danger"></span>

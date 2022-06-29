@@ -10,7 +10,7 @@ namespace TicketFrontend.Pages;
 public class Profile : PageModel
 {
     private readonly IPropertyService _pService;
-    [BindProperty(SupportsGet = true)] public User User { get; set; }
+    [BindProperty(SupportsGet = true)] public User _user { get; set; }
     
     [BindProperty(SupportsGet = true)] public string Password { get; set; }
     [Compare("Password", ErrorMessage = "De to koder passer ikke, prøv lige igen!")] public string ConfirmPassword { get; set; }
@@ -21,19 +21,21 @@ public class Profile : PageModel
     }
     public async Task<IActionResult> OnGet(int id)
     {
-        User = await _pService.GetUser(id);
+        if (!User.Identity.IsAuthenticated) return RedirectToPage("Account/Login");
+
+        _user = await _pService.GetUser(id);
         return Page();
     }
 
     public async Task<IActionResult> OnPostEditUser()
     {
         var editedUser = new UserEditDTO();
-        editedUser.password = string.IsNullOrWhiteSpace(Password) ? User.password : Password;
-        editedUser.ID = User.ID;
-        editedUser.display_name = User.display_name;
-        editedUser.email = User.email;
-        editedUser.full_name = User.full_name;
-        editedUser.Created_At = User.Created_At;
+        editedUser.password = string.IsNullOrWhiteSpace(Password) ? _user.password : Password;
+        editedUser.ID = _user.ID;
+        editedUser.display_name = _user.display_name;
+        editedUser.email = _user.email;
+        editedUser.full_name = _user.full_name;
+        editedUser.Created_At = _user.Created_At;
         editedUser.RoleID = editedUser.RoleID;
 
         return RedirectToPage();

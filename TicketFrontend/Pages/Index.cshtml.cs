@@ -47,15 +47,25 @@ public class IndexModel : PageModel
         {
             return true;
         }
-        
-        var roleID = User.Claims.FirstOrDefault(c => c.Type == "https://tved.it/accessToken/roles")!.Value switch
+
+        string? role = null;
+        if (User.Claims.FirstOrDefault(c => c.Type == "https://tved.it/accessToken/roles") == null)
+        {
+            return false;
+        }
+        else
+        {
+            role =  User.Claims.FirstOrDefault(c => c.Type == "https://tved.it/accessToken/roles").Value;
+        }
+
+        var roleID = role switch
         {
             "TicketRead" => 1,
             "TicketWrite" => 2,
             "TicketAdmin" => 3,
             _ => 0
         };
-        
+
         if (roleID == 0) return false;
         
         var newUser = new UserDTO
@@ -63,13 +73,13 @@ public class IndexModel : PageModel
             Created_At = DateTime.Now,
             display_name = User.Claims.FirstOrDefault(c => c.Type == "nickname")?.Value,
             email = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Email)?.Value,
-            full_name = User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Name)?.Value,
+            full_name = User.Claims.FirstOrDefault(t => t.Type == "name")?.Value,
             password = "", 
-            RoleID= roleID
+            RoleID = (int) roleID
         };
         await _pService.CreateUser(newUser);   
         
-        return false;
+        return true;
     }
 
 }
