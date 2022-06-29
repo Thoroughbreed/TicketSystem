@@ -9,6 +9,10 @@ public class ClosedTickets : PageModel
 {
     private readonly ITicketService _service;
 
+    [BindProperty(SupportsGet = true)] public string Search { get; set; }
+    [BindProperty(SupportsGet = true)] public TicketOrderOptions orderOptions { get; set; }
+    
+    
     [BindProperty(SupportsGet = true)] public List<Ticket> FoundTickets { get; set; }
     [BindProperty(SupportsGet = true)] public int CurrPage { get; set; } = 1;
     public int PageCount { get; set; }
@@ -23,9 +27,12 @@ public class ClosedTickets : PageModel
     {
         if (!User.Identity.IsAuthenticated) return RedirectToPage("Account/Login");
         
-        var pageCount = await _service.GetAllTickets();
-        PageCount = pageCount.Count;
-        FoundTickets = await _service.GetClosedTicketsQ(CurrPage, PageSize);
+        var pageCount = await _service.GetTicketsQ(Search);
+        PageCount = pageCount.Where(t => t.TClosed).Count();
+        // var pageCount = await _service.GetAllTickets();
+        // PageCount = pageCount.Count;
+        
+        FoundTickets = await _service.GetClosedTicketsQ(CurrPage, PageSize, orderOptions, Search);
         return Page();
     }
 }

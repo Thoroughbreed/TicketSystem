@@ -70,6 +70,28 @@ public class TicketService : ITicketService
         return tickets != null ? tickets.Where(t => t.TClosed == true).ToList() : new List<Ticket>();
     }
 
+    public async Task<IQueryable<Ticket>> GetClosedTicketsQ(string? search)
+    {
+        await InitializeHttpClient();
+        var items = await _client.GetFromJsonAsync<List<Ticket>>($"{AppConstants._ticketUrl}/all");
+
+        return string.IsNullOrWhiteSpace(search)
+            ? items.AsQueryable()
+            : items.Where(t => t.TDesc.Contains(search) || t.TCaption.Contains(search) || t.ID.Equals(search))
+                .AsQueryable();
+    }
+
+    public async Task<List<Ticket>> GetClosedTicketsQ(int currPage, int pageSize, TicketOrderOptions options,
+        string search = null)
+    {
+        var items = await GetClosedTicketsQ(search);
+        return items != null ? items.Where(t => t.TClosed)
+            .OrderByOptions(options)
+            .Skip((currPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToList() : new List<Ticket>();
+    }
+
     public async Task<List<Ticket>> GetClosedTicketsQ(int currPage, int pageSize)
     {
         await InitializeHttpClient();
