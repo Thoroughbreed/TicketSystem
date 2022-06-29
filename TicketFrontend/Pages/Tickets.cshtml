@@ -12,7 +12,7 @@
         <th>Titel</th>
         <th>Beskrivelse</th>
         <th>Oprettet den</th>
-        <th>Anmoder</th>
+        @* <th>Anmoder</th> *@
         <th>Prioritet</th>
         <th>Kategori</th>
         <th>Status</th>
@@ -37,7 +37,7 @@
                     }
                 </td>
                 <td>@item.TCreatedAt</td>
-                <td>@item.Requester.full_name</td>
+                @* <td>@item.Requester.full_name</td> *@
                 <td>@item.Priority.priority</td>
                 <td>@item.Category.category</td>
                 <td>@item.Status.status</td>

@@ -8,10 +8,18 @@
     <h1 class="display-4">TicketDesk forside</h1>
     <hr/>
     <div class="row">
-        <p class="display-6">Open tickets: @Model.Open</p>
-        <p class="display-6">Paused tickets: @Model.Paused</p>
-        <p class="display-6">Resolved tickets: @Model.Resolved</p>
-        <p class="display-6">Closed tickets: @Model.Closed</p>
+        @if (Model.Authed)
+        {
+            <p class="display-6">Open tickets: @Model.Open</p>
+            <p class="display-6">Paused tickets: @Model.Paused</p>
+            <p class="display-6">Resolved tickets: @Model.Resolved</p>
+            <p class="display-6">Closed tickets: @Model.Closed</p>            
+        }
+        else
+        {
+            <p class="display-6">Please <a asp-page="/Account/Login">log in</a> first!</p>
+        }
+        
     </div>
     
 </div>

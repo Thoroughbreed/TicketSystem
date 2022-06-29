@@ -21,7 +21,8 @@ public class TicketDb : DbContext
         if (!oB.IsConfigured)
         {
             // oB.UseSqlServer("Server = sdktofixdb01; Database = TicketDesk; User Id=program1; Password=smp4519");
-            oB.UseSqlServer("Server = (localdb)\\mssqllocaldb; Database = TicketTest; Trusted_Connection = True;")
+            // oB.UseSqlServer("Server = (localdb)\\mssqllocaldb; Database = TicketTest; Trusted_Connection = True;")
+            oB.UseSqlServer("Server = (localdb)\\mssqllocaldb; Database = TicketDesk; Trusted_Connection = True;")
                 .EnableSensitiveDataLogging(true)
                 .UseLoggerFactory(new ServiceCollection()
                 .AddLogging(b => b.AddConsole()
@@ -55,18 +56,18 @@ public class TicketDb : DbContext
             .HasOne(t => t.Priority)
             .WithMany()
             .HasForeignKey(k => k.TPriorityID);
-        mB.Entity<Ticket>()
-            .HasOne(t => t.Requester)
-            .WithMany()
-            .HasForeignKey(k => k.TRequesterID);
+        // mB.Entity<Ticket>()
+        //     .HasOne(t => t.Requester)
+        //     .WithMany()
+        //     .HasForeignKey(k => k.TRequesterID);
         mB.Entity<Ticket>()
             .HasOne(t => t.Creator)
             .WithMany()
             .HasForeignKey(k => k.TCreatorID);
-        mB.Entity<Ticket>()
-            .HasOne(t => t.Asignee)
-            .WithMany()
-            .HasForeignKey(k => k.TAssignedID);
+        // mB.Entity<Ticket>()
+        //     .HasOne(t => t.Asignee)
+        //     .WithMany()
+        //     .HasForeignKey(k => k.TAssignedID);
         mB.Entity<Ticket>()
             .HasOne(t => t.Closer)
             .WithMany()

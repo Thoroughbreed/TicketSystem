@@ -20,25 +20,52 @@
             </button>
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Create">Opret ny</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Tickets">Åbne Tickets</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/ClosedTickets">Lukkede Tickets</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Admin panel
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" asp-page="/Admin/Properties">Properties</a>
-                            <a class="dropdown-item" asp-page="/Admin/Users">Brugere</a>
-                        </div>
-                    </li>
-                </ul>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                          <a class="nav-link text-dark" asp-area="" asp-page="/Create">Opret ny</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Tickets">Åbne Tickets</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/ClosedTickets">Lukkede Tickets</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-info disabled" asp-area="" asp-page="/Create">Opret ny</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-info disabled" asp-area="" asp-page="/Tickets">Åbne Tickets</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-info disabled" asp-area="" asp-page="/ClosedTickets">Lukkede Tickets</a>
+                        </li>
+                    }
+                    @if (User.Claims.FirstOrDefault(c => c.Value == "TicketAdmin") != null)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-danger" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Admin panel
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" asp-page="/Admin/Properties">Properties</a>
+                                <a class="dropdown-item" asp-page="/Admin/Users">Brugere</a>
+                            </div>
+                        </li>
+                        
+                    }
+                    else
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-info disabled" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Admin panel
+                            </a>
+                        </li>
+                    }
+                    </ul>
                 <ul class="navbar-nav">
                     @if (User.Identity.IsAuthenticated)
                     {

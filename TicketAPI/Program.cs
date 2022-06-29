@@ -70,8 +70,8 @@ app.MapGet("/tickets", async (TicketDb db) =>
         .Include(t => t.Priority)
         .Include(t => t.Status)
         .Include(t => t.Category)
-        .Include(t => t.Asignee)
-        .Include(t => t.Requester)
+        // .Include(t => t.Asignee)
+        // .Include(t => t.Requester)
         .AsNoTracking()
         .ToListAsync();
     return tickets;
@@ -84,8 +84,8 @@ app.MapGet("/tickets/all", async (TicketDb db) =>
         .Include(t => t.Priority)
         .Include(t => t.Status)
         .Include(t => t.Category)
-        .Include(t => t.Asignee)
-        .Include(t => t.Requester)
+        // .Include(t => t.Asignee)
+        // .Include(t => t.Requester)
         .AsNoTracking()
         .ToListAsync();
     return tickets;
@@ -100,8 +100,8 @@ app.MapGet("/tickets/{id}", async (int id, TicketDb db) =>
         .Include(t => t.Status)
         .Include(t => t.Category)
         .Include(t => t.Creator)
-        .Include(t => t.Asignee)
-        .Include(t => t.Requester)
+        // .Include(t => t.Asignee)
+        // .Include(t => t.Requester)
         .Include(t => t.Comments)
         .ThenInclude(c => c.User)
         .AsNoTracking()

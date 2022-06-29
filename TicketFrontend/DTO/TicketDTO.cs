@@ -15,9 +15,9 @@ public class TicketDTO
 
     // User
     public int TCreatorID { get; set; }
-    public int? TAssignedID { get; set; }
+    // public int? TAssignedID { get; set; }
    
-    public int TRequesterID { get; set; }
+    // public int TRequesterID { get; set; }
     
     public int TCategoryID { get; set; }
     public int TPriorityID { get; set; }

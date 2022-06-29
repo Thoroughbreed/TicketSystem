@@ -34,20 +34,14 @@
                     <div class="row"><span class="text-danger" asp-validation-for="newTicket.TCategoryID"></span></div>
                 </div>
                 <div class="row">
-                    <label>Oprettet af:</label>
-                    <select asp-for="newTicket.TCreatorID" asp-items="@(new SelectList(Model.Users, "ID", "full_name"))">
-                        <option>Vælg bruger</option>
-                    </select>
-                </div>
-                <div class="row">
                     <span class="text-danger" asp-validation-for="newTicket.TCreatorID"></span>
                 </div>
-                <div class="row">
-                    <label>Tildel til:</label>
-                    <select asp-for="newTicket.TAssignedID" asp-items="@(new SelectList(Model.Users, "ID", "full_name"))">
-                        <option>Vælg bruger</option>
-                    </select>
-                </div>
+                @* <div class="row"> *@
+                @*     <label>Tildel til:</label> *@
+                @*     <select asp-for="newTicket.TAssignedID" asp-items="@(new SelectList(Model.Users, "ID", "full_name"))"> *@
+                @*         <option>Vælg bruger</option> *@
+                @*     </select> *@
+                @* </div> *@
                 <hr/>
                 <div class="row">
                     <div class="col">

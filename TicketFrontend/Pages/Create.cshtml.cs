@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using TicketFrontend.DTO;
 using TicketFrontend.Models;
 using TicketFrontend.Service;
@@ -34,9 +34,11 @@ public class Create : PageModel
     
     public async Task<IActionResult> OnPostSaveTicket()
     {
-        newTicket.TRequesterID = 1; // #TODO MAKE REQUESTER FIELD THINGY
+        // newTicket.TRequesterID = 1; // #TODO MAKE REQUESTER FIELD THINGY
         newTicket.TCreatedAt = DateTime.Now;
         newTicket.TStatusID = 1;
+        var _creator = await _pService.GetUsers();
+        newTicket.TCreatorID = _creator.FirstOrDefault(u => u.email == User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value).ID;
         if (!ModelState.IsValid)
         {
             Categories = await _pService.GetCategories();

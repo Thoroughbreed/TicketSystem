@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TicketFrontend.Models;
 using TicketFrontend.Service;
@@ -15,6 +16,7 @@ public class Detail : PageModel
     [BindProperty] public Comments Comment { get; set; } = new();
     [BindProperty(SupportsGet = true)] public int ProgressBar { get; set; }
     [BindProperty(SupportsGet = true)] public string ProgressBarCol { get; set; }
+    [BindProperty(SupportsGet = true)] public int UserID { get; set; }
     public List<Category> Categories { get; set; }
     public List<Priority> Priorities { get; set; }
     public List<Status> Status { get; set; }
@@ -27,30 +29,34 @@ public class Detail : PageModel
 
     public async Task<IActionResult> OnGet(int ticketId)
     {
+        var _ul = await _propertyService.GetUsers();
+        UserID = _ul.FirstOrDefault(u => u.email == User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value).ID;
         FoundTicket = await _service.GetTicketByID(ticketId);
         if (FoundTicket != null)
         {
             Changelogs = await _service.GetLogs(FoundTicket.ID);
             Comment.TicketID = FoundTicket.ID;
-            Comment.UserID = FoundTicket.TCreatorID;
-            ProgressBar = FoundTicket.TStatusID switch
+            // Comment.UserID = FoundTicket.TCreatorID;
+            ProgressBar = FoundTicket.Status.status switch
             {
-                1 => 0,
-                2 => 25,
-                3 or 4 => 50,
-                5 => 75,
-                6 => 85,
-                > 6 => 100,
+                "Ny" => 0,
+                "Igangværende" => 25,
+                "Udskudt" => 50,
+                "Afvist" => 100,
+                "Pause" => 50,
+                "Resolved" => 90,
+                "Lukket" => 100,
+                "Venter på bruger" or "Afventer godkendelse" => 75,
                 _ => ProgressBar
             };
-            ProgressBarCol = FoundTicket.TStatusID switch
+            ProgressBarCol = FoundTicket.Status.status switch
             {
-                1 => "bg-info",
-                2 => "bg-success",
-                3 or 4 or 5 => "bg-warning",
-                6 => "bg-info",
-                7 => "bg-success",
-                8 => "bg-danger",
+                "Ny" => "bg-info",
+                "Igangværende" => "bg-success",
+                "Udskudt" or "Pause" => "bg-warning",
+                "Resolved" or "Lukket" => "bg-success",
+                "Afvist" => "bg-danger",
+                "Venter på bruger" or "Afventer godkendelse" => "bg-warning",
                 _ => ProgressBarCol
             };
         }
@@ -64,7 +70,7 @@ public class Detail : PageModel
 
     public async Task<IActionResult> OnPostSaveTicket()
     {
-        if (FoundTicket.TStatusID is 3 or 4 or 5) FoundTicket.TPriorityID = 1;
+        // if (FoundTicket.TStatusID is 3 or 4 or 5) FoundTicket.TPriorityID = 1;
         await _service.EditTicket(FoundTicket);
         return RedirectToPage();
     }
@@ -77,13 +83,20 @@ public class Detail : PageModel
 
     public async Task<IActionResult> OnPostCloseTicket()
     {
-        await _service.CloseTicket(FoundTicket.ID, 5); // #TODO HARDCODED USER VALUE
+        await _service.CloseTicket(FoundTicket.ID, await GetUserID());
         return RedirectToPage();
     }
 
     public async Task<IActionResult> OnPostReOpen()
     {
-        await _service.ReOpenTicket(FoundTicket.ID, 4); // #TODO HARDCODED USER VALUE
+        await _service.ReOpenTicket(FoundTicket.ID, await GetUserID());
         return RedirectToPage();
+    }
+
+    private async Task<int> GetUserID()
+    {
+        var _ul = await _propertyService.GetUsers();
+        return _ul.FirstOrDefault(u => u.email == User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value).ID;
+        return _ul.FirstOrDefault(u => u.display_name == User.Claims.FirstOrDefault(c => c.Type == "nickname")?.Value.ToUpper()).ID;
     }
 }

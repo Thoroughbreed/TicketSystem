@@ -56,7 +56,9 @@ public class TicketService : ITicketService
     {
         await InitializeHttpClient();
         var items = await _client.GetFromJsonAsync<List<Ticket>>($"{AppConstants._ticketUrl}/all");
-        return items != null ? items.OrderByDescending(t => t.TPriorityID)
+        return items != null ? items
+            .Where(t => t.TClosed == true)
+            .OrderByDescending(t => t.TPriorityID)
             .Skip((currPage - 1) * pageSize)
             .Take(pageSize)
             .ToList() : new List<Ticket>();
@@ -77,7 +79,7 @@ public class TicketService : ITicketService
         var ticketDTO = new TicketDTO
         {
             ID = ticketId,
-            TAssignedID = ticket.TAssignedID,
+            // TAssignedID = ticket.TAssignedID,
             TCaption = ticket.TCaption,
             TCategoryID = ticket.TCategoryID,
             TClosed = true,
@@ -85,9 +87,9 @@ public class TicketService : ITicketService
             TCreatorID = ticket.TCreatorID,
             TDesc = ticket.TDesc,
             TPriorityID = ticket.TPriorityID,
-            TRequesterID = ticket.TRequesterID,
-            TStatusID = 7,
-            TClosedByID = 5 // #TODO HARDCODED USER VALUE
+            // TRequesterID = ticket.TRequesterID,
+            TStatusID = 8, // 8 is hardcoded, statusID for closed ticket
+            TClosedByID = userId
         };
         
         var debugJson = JsonSerializer.Serialize(ticketDTO);
@@ -106,14 +108,14 @@ public class TicketService : ITicketService
             ID = ticket.ID,
             TCreatedAt = ticket.TCreatedAt,
             TCaption = ticket.TCaption,
-            TAssignedID = ticket.TAssignedID,
+            // TAssignedID = ticket.TAssignedID,
             TPriorityID = ticket.TPriorityID,
             TStatusID = ticket.TStatusID,
             TCategoryID = ticket.TCategoryID,
             TDesc = ticket.TDesc,
             TClosed = false,
             TCreatorID = ticket.TCreatorID,
-            TRequesterID = ticket.TRequesterID
+            // TRequesterID = ticket.TRequesterID
         };
         await _client.PutAsJsonAsync(AppConstants._ticketUrl, updatedTicket);
         await CreateChangelog(new TicketChangelog
@@ -172,7 +174,7 @@ public class TicketService : ITicketService
         var ticketDTO = new TicketDTO
         {
             ID = ticketId,
-            TAssignedID = ticket.TAssignedID,
+            // TAssignedID = ticket.TAssignedID,
             TCaption = ticket.TCaption,
             TCategoryID = ticket.TCategoryID,
             TClosed = false,
@@ -180,8 +182,8 @@ public class TicketService : ITicketService
             TCreatorID = ticket.TCreatorID,
             TDesc = ticket.TDesc,
             TPriorityID = ticket.TPriorityID,
-            TRequesterID = ticket.TRequesterID,
-            TStatusID = 2,
+            // TRequesterID = ticket.TRequesterID,
+            TStatusID = userId,
             TClosedByID = null
         };
         
