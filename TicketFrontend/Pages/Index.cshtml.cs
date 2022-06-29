@@ -30,7 +30,7 @@ public class IndexModel : PageModel
         Closed = closed.Count;
         Paused = open.Count(t => t.TStatusID is 3 or 5 or 10 or 12);
         Open = open.Count(t => t.TStatusID is 1 or 2);
-        Resolved = open.Count(t => t.TStatusID is 4 or 7 or 8);
+        Resolved = open.Count(t => t.TStatusID is 4 or 7);
 
         return Page();
     }
