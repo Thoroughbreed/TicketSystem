@@ -21,9 +21,16 @@ else
             </div>
         </div>
         <div class="row">
-            <div class="col-6">
+        <div class="col-6">
+            @if (User.HasClaim("https://tved.it/accessToken/roles", "TicketWrite"))
+            {
                 <textarea style="resize:none" rows="12" cols="75" asp-for="FoundTicket.TDesc"></textarea>
-            </div>
+            }
+            else
+            {
+                <textarea readonly style="resize:none" rows="12" cols="75" asp-for="FoundTicket.TDesc"></textarea>
+            }
+        </div>
             <div class="col-6">
                 <div class="row border border-info">
                     <div class="row m-1">
