@@ -15,7 +15,7 @@ public class Ticket
 
     // User
     public int TCreatorID { get; set; }
-    // public int? TAssignedID { get; set; }
+    public int? TAssignedID { get; set; }
     public int? TClosedByID { get; set; }
     
     // public int TRequesterID { get; set; }
@@ -26,7 +26,7 @@ public class Ticket
     
     // Navigation properties
     public User Creator { get; set; }
-    // public User Asignee { get; set; }
+    public User Asignee { get; set; }
     public User Closer { get; set; }
     // public Requester Requester { get; set; }
     public Category Category { get; set; }

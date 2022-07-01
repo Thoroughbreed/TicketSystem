@@ -20,6 +20,7 @@ public class Detail : PageModel
     public List<Category> Categories { get; set; }
     public List<Priority> Priorities { get; set; }
     public List<Status> Status { get; set; }
+    public List<User> Users { get; set; }
 
     public Detail(ITicketService service, IPropertyService propertyService)
     {
@@ -66,6 +67,7 @@ public class Detail : PageModel
         Categories = await _propertyService.GetCategories();
         Priorities = await _propertyService.GetPriority();
         Status = await _propertyService.GetStatus();
+        Users = await _propertyService.GetUsers();
         
         return Page();
     }

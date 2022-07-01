@@ -60,11 +60,15 @@ else
                 <label>Created by: @Model.FoundTicket.Creator.display_name</label><br/>
                 <input asp-for="FoundTicket.TCreatedAt" hidden="true" />
                 <label>Created at: @Model.FoundTicket.TCreatedAt</label>
-                @if (Model.FoundTicket.Asignee != null)
+                <hr/>
+                @if (Model.FoundTicket.TAssignedID != null)
                 {
-                    <hr/>
-                    <label>Assigned to: @Model.FoundTicket.Asignee.display_name</label>
+                    <label>Assigned to: </label>
                 }
+                <select asp-for="FoundTicket.TAssignedID" asp-items="@(new SelectList(Model.Users, "ID", "full_name"))">
+                    <option>Tildel til</option>
+                </select>
+                
                 @if (Model.Changelogs.Count > 0)
                 {
                     <hr/>

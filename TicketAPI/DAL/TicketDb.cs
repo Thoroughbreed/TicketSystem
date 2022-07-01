@@ -64,10 +64,10 @@ public class TicketDb : DbContext
             .HasOne(t => t.Creator)
             .WithMany()
             .HasForeignKey(k => k.TCreatorID);
-        // mB.Entity<Ticket>()
-        //     .HasOne(t => t.Asignee)
-        //     .WithMany()
-        //     .HasForeignKey(k => k.TAssignedID);
+        mB.Entity<Ticket>()
+            .HasOne(t => t.Asignee)
+            .WithMany()
+            .HasForeignKey(k => k.TAssignedID);
         mB.Entity<Ticket>()
             .HasOne(t => t.Closer)
             .WithMany()

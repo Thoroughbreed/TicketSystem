@@ -151,7 +151,7 @@ public class TicketService : ITicketService
             ID = ticket.ID,
             TCreatedAt = ticket.TCreatedAt,
             TCaption = ticket.TCaption,
-            // TAssignedID = ticket.TAssignedID,
+            TAssignedID = ticket.TAssignedID,
             TPriorityID = ticket.TPriorityID,
             TStatusID = ticket.TStatusID,
             TCategoryID = ticket.TCategoryID,

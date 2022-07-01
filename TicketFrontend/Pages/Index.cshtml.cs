@@ -14,6 +14,7 @@ public class IndexModel : PageModel
     public int Open { get; set; }
     public int Paused { get; set; }
     public int Resolved { get; set; }
+    public int MyTickets { get; set; }
     public bool Authed { get; set; }
     public IndexModel(ITicketService service, IPropertyService pService)
     {
@@ -31,6 +32,11 @@ public class IndexModel : PageModel
         Paused = open.Count(t => t.TStatusID is 3 or 5 or 10 or 12);
         Open = open.Count(t => t.TStatusID is 1 or 2);
         Resolved = open.Count(t => t.TStatusID is 4 or 7);
+        // MyTickets = open.Count(t => t.Asignee?.display_name == User.Identity.Name);
+        var userID = await  _pService.GetUsers();
+        var user = userID.FirstOrDefault(u =>
+            u.email == User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value);
+        MyTickets = open.Count(t => t.TAssignedID == user.ID);
 
         return Page();
     }
