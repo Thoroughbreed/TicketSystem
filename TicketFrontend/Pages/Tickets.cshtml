@@ -11,23 +11,29 @@
         <form method="get" id="searchForm">
             <div class="row">
                 <div class="row">
-                    <div class="col-9">
+                    <div class="col-8">
                         
                     </div>
-                    <div class="col-3">
-                        <label asp-for="orderOptions">Sorter på: </label>
+                    <div class="col-2">
+                        <label asp-for="orderOptions">Sorter på:</label>
+                    </div>
+                    <div class="col-2">
+                        <label asp-for="onlyMine">Kun mine tickets:</label>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="input-group mb-3 col-9">
+                    <div class="input-group mb-3 col-8">
                         <input type="search" asp-for="Search" class="form-control" placeholder="Søg på titel eller beskrivelse">
                         <div class="input-group-append">
                             <button class="btn btn-outline-secondary" type="submit">
                                 <i class="fa fa-search"></i>
                             </button>
                         </div>
-                        <div class="input-group-append col-3">
+                        <div class="input-group-append col-2">
                             <select asp-for="orderOptions" asp-items="Html.GetEnumSelectList<TicketOrderOptions>()" class="accordion" onchange="searchForm.submit()"></select>
+                        </div>
+                        <div class="input-group-append col-2">
+                            <input type="checkbox" asp-for="onlyMine"/>
                         </div>
                     </div>
                 </div>
@@ -90,7 +96,8 @@
                     <a asp-page="./Tickets" class="page-link" asp-all-route-data="@(new Dictionary<string, string>{
                                                                                        { "CurrPage", @i.ToString() },
                                                                                       { "Search", Model.Search },
-                                                                                      { "orderOptions", Model.orderOptions.ToString() }
+                                                                                      { "orderOptions", Model.orderOptions.ToString() },
+                                                                                      { "onlyMine", Model.onlyMine.ToString() }
                 })">@i</a>
             </li>
             }

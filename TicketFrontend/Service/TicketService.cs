@@ -53,6 +53,16 @@ public class TicketService : ITicketService
             .Skip((currPage - 1) * pageSize)
             .Take(pageSize)
             .ToList();
+    }   
+    public async Task<List<Ticket>> GetTicketsQ(int currPage, int pageSize, TicketOrderOptions options, bool onlyMine, int uID, string search = null)
+    {
+        var q = await GetTicketsQ(search);
+        var tickets = q.OrderByOptions(options)
+            .Skip((currPage - 1) * pageSize)
+            .Take(pageSize);
+
+        if (onlyMine) return tickets.Where(t => t.TAssignedID == uID).Count() > 0 ? tickets.Where(t => t.TAssignedID == uID).ToList() : new List<Ticket>();
+        else return tickets.ToList();
     }
 
     public async Task<IQueryable<Ticket>> GetTicketsQ(string? search)

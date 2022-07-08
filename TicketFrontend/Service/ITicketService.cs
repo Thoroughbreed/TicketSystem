@@ -9,6 +9,8 @@ public interface ITicketService
     public Task<IQueryable<Ticket>> GetTicketsQ(string? search);
     public Task<List<Ticket>> GetTicketsQ(int currPage, int pageSize);
     public Task<List<Ticket>> GetTicketsQ(int currPage, int pageSize, TicketOrderOptions options, string search = null);
+
+    public Task<List<Ticket>> GetTicketsQ(int currPage, int pageSize, TicketOrderOptions options, bool onlyMine, int uID, string search = null);
     public Task<List<Ticket>> GetAllTickets();
     public Task<List<Ticket>> GetClosedTicketsQ(int currPage, int pageSize);
 
