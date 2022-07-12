@@ -20,7 +20,7 @@
             </button>
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-                    @if (User.Identity.IsAuthenticated && User.HasClaim("https://tved.it/accessToken/roles", "TicketRead"))
+                    @if (User.Identity.IsAuthenticated && User.HasClaim("https://hartmann-group.net/accessToken/roles", "TicketRead"))
                     {
                         <li class="nav-item">
                           <a class="nav-link text-info disabled" asp-area="" asp-page="/Create">Opret ny</a>
@@ -32,7 +32,7 @@
                             <a class="nav-link text-dark" asp-area="" asp-page="/ClosedTickets">Lukkede Tickets</a>
                         </li>
                     }
-                    else if (User.Identity.IsAuthenticated && User.HasClaim("https://tved.it/accessToken/roles", "TicketWrite"))
+                    else if (User.Identity.IsAuthenticated && User.HasClaim("https://hartmann-group.net/accessToken/roles", "TicketWrite"))
                     {
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Create">Opret ny</a>

@@ -8,10 +8,9 @@ public class UserProfile : PageModel
 {
     public IActionResult OnGet()
     {
-        if (!User.Identity.IsAuthenticated) return RedirectToPage("Account/Login");
+        if (User.Identity == null || !User.Identity.IsAuthenticated) return RedirectToPage("Account/Login");
 
-        var debug = User.Claims.FirstOrDefault(c => c.Type == "https://tved.it/accessToken/roles")!.Value;
+        var debug = User.Claims.FirstOrDefault(c => c.Type == "https://hartmann-group.net/accessToken/roles")!.Value;
         return Page();
-
     }
 }

@@ -29,8 +29,6 @@ public class ClosedTickets : PageModel
         
         var pageCount = await _service.GetTicketsQ(Search);
         PageCount = pageCount.Where(t => t.TClosed).Count();
-        // var pageCount = await _service.GetAllTickets();
-        // PageCount = pageCount.Count;
         
         FoundTickets = await _service.GetClosedTicketsQ(CurrPage, PageSize, orderOptions, Search);
         return Page();

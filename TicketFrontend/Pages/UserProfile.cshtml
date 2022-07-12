@@ -13,11 +13,11 @@
     <div class="row">
         <div class="col-md-6">
             <p class="display-6">@User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Email)?.Value</p>
-            <p class="display-6">@User.Claims.FirstOrDefault(c => c.Type == "https://tved.it/accessToken/roles")!.Value</p>
+            <p class="display-6">@User.Claims.FirstOrDefault(c => c.Type == "https://hartmann-group.net/accessToken/roles")!.Value</p>
             <img src="@User.Claims.FirstOrDefault(t => t.Type == "picture")?.Value"/>
         </div>
         <div class="col-md-6">
-            @foreach (var claim in @User.Claims.Where(c => c.Type is "nickname" or "name" or "https://tved.it/accessToken/roles" or "updated_at" or "email_verified"))
+            @foreach (var claim in @User.Claims.Where(c => c.Type is "nickname" or "name" or "https://hartmann-group.net/accessToken/roles" or "updated_at" or "email_verified"))
             {
                 <p>@claim.Type - @claim.Value</p>
             }

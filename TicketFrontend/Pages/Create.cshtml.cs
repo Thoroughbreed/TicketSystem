@@ -35,11 +35,11 @@ public class Create : PageModel
     
     public async Task<IActionResult> OnPostSaveTicket()
     {
-        // newTicket.TRequesterID = 1; // #TODO MAKE REQUESTER FIELD THINGY
         newTicket.TCreatedAt = DateTime.Now;
         newTicket.TStatusID = 1;
         var _creator = await _pService.GetUsers();
         newTicket.TCreatorID = _creator.FirstOrDefault(u => u.email == User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value).ID;
+        ModelState.Remove("newTicket.TAssignedID");
         if (!ModelState.IsValid)
         {
             Categories = await _pService.GetCategories();

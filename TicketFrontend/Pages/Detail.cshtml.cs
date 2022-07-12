@@ -39,7 +39,6 @@ public class Detail : PageModel
         {
             Changelogs = await _service.GetLogs(FoundTicket.ID);
             Comment.TicketID = FoundTicket.ID;
-            // Comment.UserID = FoundTicket.TCreatorID;
             ProgressBar = FoundTicket.Status.status switch
             {
                 "Ny" => 0,
@@ -74,7 +73,6 @@ public class Detail : PageModel
 
     public async Task<IActionResult> OnPostSaveTicket()
     {
-        // if (FoundTicket.TStatusID is 3 or 4 or 5) FoundTicket.TPriorityID = 1;
         await _service.EditTicket(FoundTicket);
         return RedirectToPage();
     }
@@ -101,6 +99,5 @@ public class Detail : PageModel
     {
         var _ul = await _propertyService.GetUsers();
         return _ul.FirstOrDefault(u => u.email == User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value).ID;
-        return _ul.FirstOrDefault(u => u.display_name == User.Claims.FirstOrDefault(c => c.Type == "nickname")?.Value.ToUpper()).ID;
     }
 }

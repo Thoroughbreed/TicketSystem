@@ -32,7 +32,7 @@ public class IndexModel : PageModel
         Paused = open.Count(t => t.TStatusID is 3 or 5 or 10 or 12);
         Open = open.Count(t => t.TStatusID is 1 or 2);
         Resolved = open.Count(t => t.TStatusID is 4 or 7);
-        // MyTickets = open.Count(t => t.Asignee?.display_name == User.Identity.Name);
+        
         var userID = await  _pService.GetUsers();
         var user = userID.FirstOrDefault(u =>
             u.email == User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value);
@@ -55,13 +55,13 @@ public class IndexModel : PageModel
         }
 
         string? role = null;
-        if (User.Claims.FirstOrDefault(c => c.Type == "https://tved.it/accessToken/roles") == null)
+        if (User.Claims.FirstOrDefault(c => c.Type == "https://hartmann-group.net/accessToken/roles") == null)
         {
             return false;
         }
         else
         {
-            role =  User.Claims.FirstOrDefault(c => c.Type == "https://tved.it/accessToken/roles").Value;
+            role =  User.Claims.FirstOrDefault(c => c.Type == "https://hartmann-group.net/accessToken/roles").Value;
         }
 
         var roleID = role switch

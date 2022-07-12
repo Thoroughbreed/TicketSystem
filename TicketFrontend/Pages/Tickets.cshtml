@@ -79,7 +79,7 @@
                     <a asp-page="Detail" class="btn btn-outline-info" asp-route-ticketId="@item.ID">Detaljer</a>
                 </td>
                 <td>
-                    @if (User.HasClaim("https://tved.it/accessToken/roles", "TicketWrite"))
+                    @if (User.HasClaim("https://hartmann-group.net/accessToken/roles", "TicketWrite"))
                     {
                         <a asp-page="Tickets" class="btn btn-outline-danger" asp-page-handler="CloseTaskDebug" asp-route-ticketId="@item.ID" asp-route-userId="5">Tvangs luk</a>
                     }
